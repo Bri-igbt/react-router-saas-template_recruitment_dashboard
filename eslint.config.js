@@ -35,6 +35,11 @@ export default tseslint.config(
       'simple-import-sort': simpleImportSort,
     },
     rules: {
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       'unicorn/better-regex': 'warn',
@@ -42,14 +47,14 @@ export default tseslint.config(
       'unicorn/no-array-reduce': 'off',
       'unicorn/prevent-abbreviations': [
         'error',
-        { replacements: { params: false, utils: false } },
+        { replacements: { params: false, props: false, utils: false } },
       ],
     },
   },
   {
-    files: ['src/**/*.test.{js,ts,jsx,tsx}'],
+    files: ['app/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     plugins: { vitest },
-    rules: { ...vitest.configs.recommended.rules },
+    rules: { ...vitest.configs.recommended.rules, 'unicorn/no-null': 'off' },
     settings: { vitest: { typecheck: true } },
     languageOptions: { globals: { ...vitest.environments.env.globals } },
   },
@@ -58,8 +63,11 @@ export default tseslint.config(
     ...testingLibrary.configs['flat/react'],
   },
   {
-    files: ['**/*.spec.ts'],
+    files: ['playwright/**/*.spec.ts'],
     ...playwright.configs['flat/recommended'],
+    rules: {
+      'playwright/no-conditional-expect': 'off',
+    },
   },
   eslintPluginPrettierRecommended,
 );

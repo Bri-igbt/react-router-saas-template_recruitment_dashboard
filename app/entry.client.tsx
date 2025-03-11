@@ -9,7 +9,31 @@ import { getInitialNamespaces } from 'remix-i18next/client';
 
 import i18n from '~/utils/i18n';
 
+import { onUnhandledRequest } from './test/mocks/msw-utils';
+
+// @see https://remix.run/docs/en/main/guides/envvars#browser-environment-variables
+export type EnvironmentVariables = {
+  CLIENT_MOCKS?: string;
+};
+
+declare global {
+  // eslint-disable-next-line no-var
+  var ENV: EnvironmentVariables;
+}
+
+async function activateMsw() {
+  if (ENV.CLIENT_MOCKS === 'true') {
+    const { worker } = await import('./test/mocks/browser');
+
+    return worker.start({ onUnhandledRequest });
+  }
+
+  return;
+}
+
 async function hydrate() {
+  await activateMsw();
+
   await i18next
     .use(initReactI18next)
     .use(LanguageDetector)

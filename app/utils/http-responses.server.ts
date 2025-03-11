@@ -1,0 +1,135 @@
+import { data } from 'react-router';
+
+type NestedJSON = {
+  [key: string]: string | NestedJSON;
+};
+
+export type DataWithResponseInit<Data> = ReturnType<typeof data<Data>>;
+
+/**
+ * Returns a 400 Bad Request error.
+ *
+ * @returns A response with the 400 status code and a message.
+ */
+export function badRequest(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 400 Bad Request error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 400 status code and the error messages.
+ */
+export function badRequest<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function badRequest<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data({ message: 'Bad Request', ...errors }, { ...init, status: 400 })
+    : data({ message: 'Bad Request' }, { status: 400 });
+}
+
+/**
+ * Returns a 401 Unauthorized error.
+ *
+ * @returns A response with the 401 status code and a message.
+ */
+export function unauthorized(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 401 Unauthorized error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 401 status code and the error messages.
+ */
+export function unauthorized<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function unauthorized<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data({ message: 'Unauthorized', ...errors }, { ...init, status: 401 })
+    : data({ message: 'Unauthorized' }, { status: 401 });
+}
+
+/**
+ * Returns a 409 Conflict error.
+ *
+ * @returns A response with the 409 status code and a message.
+ */
+export function conflict(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 409 Conflict error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 409 status code and the error messages.
+ */
+export function conflict<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function conflict<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data({ message: 'Conflict', ...errors }, { ...init, status: 409 })
+    : data({ message: 'Conflict' }, { status: 409 });
+}
+
+/**
+ * Returns a 429 Too Many Requests error.
+ *
+ * @returns A response with the 429 status code and a message.
+ */
+export function tooManyRequests(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 429 Too Many Requests error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 429 status code and the error messages.
+ */
+export function tooManyRequests<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function tooManyRequests<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data(
+        { message: 'Too Many Requests', ...errors },
+        { ...init, status: 429 },
+      )
+    : data({ message: 'Too Many Requests' }, { status: 429 });
+}
+
+/**
+ * Returns a 404 Not Found error.
+ *
+ * @returns A response with the 404 status code and a message.
+ */
+export function notFound(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 404 Not Found error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 404 status code and the error messages.
+ */
+export function notFound<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function notFound<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data({ message: 'Not Found', ...errors }, { ...init, status: 404 })
+    : data({ message: 'Not Found' }, { status: 404 });
+}

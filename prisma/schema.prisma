@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,11 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserProfile {
-  id                         String   @id @default(cuid(2))
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
-  email                      String   @unique
-  name                       String   @default("")
-  acceptedTermsAndConditions Boolean  @default(false)
+model UserAccount {
+  id                     String                   @id @default(cuid(2))
+  supabaseUserId         String                   @unique
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  email                  String                   @unique
+  name                   String                   @default("")
+  UserAuthSession        UserAuthSession[]
+  OrganizationMembership OrganizationMembership[]
+}
+
+model UserAuthSession {
+  id             String      @id @default(cuid(2))
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  user           UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  expirationDate DateTime
+}
+
+model Organization {
+  id          String                   @id() @default(cuid(2))
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  name        String
+  website     String                   @default("")
+  /// We avoid conflicts from slugs by using Prisma middleware. See the file
+  /// `app/utils/database.server.ts`.
+  slug        String                   @unique
+  memberships OrganizationMembership[]
+}
+
+enum OrganizationMembershipRole {
+  owner
+  admin
+  member
+}
+
+model OrganizationMembership {
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  member         UserAccount                @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId       String
+  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  deactivatedAt  DateTime?
+  role           OrganizationMembershipRole @default(member)
+
+  @@id([memberId, organizationId])
 }

@@ -33,19 +33,25 @@ export const links: Route.LinksFunction = () => [
 export const handle = { i18n: 'common' };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { CLIENT_MOCKS } = process.env;
   const locale = await i18next.getLocale(request);
-  return { locale };
+  const t = await i18next.getFixedT(request);
+  const title = t('app-name');
+  return { ENV: { CLIENT_MOCKS: CLIENT_MOCKS === 'true' }, locale, title };
 }
 
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
+
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { locale } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const locale = data?.locale ?? 'en';
 
   const { i18n } = useTranslation();
 
   useChangeLanguage(locale);
 
   return (
-    <html lang={locale} dir={i18n.dir()}>
+    <html className="dark" lang={locale} dir={i18n.dir()}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -56,6 +62,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        {data?.ENV && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(data?.ENV)}`,
+            }}
+          />
+        )}
       </body>
     </html>
   );

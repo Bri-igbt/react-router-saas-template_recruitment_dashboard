@@ -1,0 +1,62 @@
+{
+  "common": {
+    "email-invalid": "A valid email consists of characters, '@' and '.'.",
+    "email-must-be-string": "A valid email address must be string.",
+    "email-required": "Please enter a valid email (required)."
+  },
+  "login": {
+    "form": {
+      "cardDescription": "Enter your email below to login to your account.",
+      "cardTitle": "Welcome back",
+      "dividerText": "Or continue with",
+      "email": "Email",
+      "emailPlaceholder": "You email address ...",
+      "google": "Google",
+      "login-failed": "Login failed. Please try again.",
+      "registerLink": "Sign up",
+      "registerPrompt": "Not a member?",
+      "submitButton": "Login",
+      "submitButtonLoading": "Logging in ...",
+      "user-doesnt-exist": "User with given email doesn't exist. Did you mean to create a new account instead?"
+    },
+    "magicLink": {
+      "cardDescription": "We've sent a secure login link to your email address. Please check your inbox and click the link to access your account.",
+      "cardTitle": "Check your email",
+      "countdownMessage_one": "Once you click the link, <1>please close this tab</1>. If you haven't received the email within {{count}} second, you may request another link.",
+      "countdownMessage_other": "Once you click the link, <1>please close this tab</1>. If you haven't received the email within {{count}} seconds, you may request another link.",
+      "countdownMessage_zero": "Once you click the link, <1>please close this tab</1>. If you haven't received the email, you may request another login link now.",
+      "resendButton": "Request new login link",
+      "resendButtonLoading": "Sending...",
+      "resendSuccess": "A new login link has been sent to your email address. Please check your inbox."
+    },
+    "pageTitle": "Login"
+  },
+  "register": {
+    "form": {
+      "cardDescription": "Create your account to get started.",
+      "cardTitle": "New here?",
+      "dividerText": "Or continue with",
+      "email": "Email",
+      "emailPlaceholder": "You email address ...",
+      "google": "Google",
+      "loginLink": "Log in",
+      "loginPrompt": "Already have an account?",
+      "registration-failed": "Registration failed. Please try again.",
+      "submitButton": "Register",
+      "submitButtonLoading": "Registering ...",
+      "termsAndPrivacy": "By creating an account, you agree to our <1>Terms of Service</1> and <2>Privacy Policy</2>.",
+      "user-already-exists": "User with given email already exists. Did you mean to log in instead?"
+    },
+    "magicLink": {
+      "cardDescription": "We've sent a verification link to your email address. Please check your inbox and click the link to complete your registration.",
+      "cardTitle": "Verify your email",
+      "countdownMessage_one": "Once you click the link, <1>please close this tab</1>. If you haven't received the email within {{count}} second, you may request another verification link.",
+      "countdownMessage_other": "Once you click the link, <1>please close this tab</1>. If you haven't received the email within {{count}} seconds, you may request another verification link.",
+      "countdownMessage_zero": "Once you click the link, <1>please close this tab</1>. If you haven't received the email, you may request another verification link now.",
+      "resendButton": "Request new verification link",
+      "resendButtonLoading": "Sending...",
+      "resendSuccess": "A new verification link has been sent to your email address. Please check your inbox."
+    },
+    "pageTitle": "Register"
+  }
+}

@@ -16,6 +16,12 @@ import i18next from '~/utils/i18next.server';
 
 export const streamTimeout = 5000;
 
+if (process.env.SERVER_MOCKS === 'true') {
+  const { supabaseHandlers } = await import('~/test/mocks/handlers/supabase');
+  const { startMockServer } = await import('~/test/mocks/server');
+  startMockServer(supabaseHandlers);
+}
+
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
