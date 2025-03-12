@@ -172,5 +172,21 @@ describe('/login route action', () => {
     });
   });
 
-  // Note: Google login tests would go here when implemented
+  describe(`${loginIntents.loginWithGoogle} intent`, () => {
+    const intent = loginIntents.loginWithGoogle;
+
+    test('given: a login request with Google, should: return a redirect response to Supabase OAuth URL with code_verifier cookie', async () => {
+      const formData = toFormData({ intent });
+
+      const response = (await sendRequest({ formData })) as Response;
+
+      expect(response.status).toEqual(302);
+      expect(response.headers.get('Location')).toMatch(
+        /^https:\/\/.*\.supabase\.co\/auth\/v1\/authorize\?provider=google/,
+      );
+      expect(response.headers.get('Set-Cookie')).toMatch(
+        /sb-.*-auth-token-code-verifier=/,
+      );
+    });
+  });
 });

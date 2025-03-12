@@ -135,8 +135,57 @@ const verifyOtpMock = http.post(
   },
 );
 
+const exchangeCodeForSessionMock = http.post(
+  `${process.env.SUPABASE_URL}/auth/v1/token?grant_type=pkce`,
+  async ({ request }) => {
+    // Parse the request body to get code_verifier.
+    const body = (await request.json()) as Record<string, string>;
+    const { auth_code, code_verifier } = body;
+
+    // Validate the request.
+    if (!auth_code) {
+      return HttpResponse.json(
+        { error: 'Invalid code', message: 'code is required' },
+        { status: 400 },
+      );
+    }
+
+    if (!code_verifier) {
+      return HttpResponse.json(
+        {
+          error: 'Invalid code_verifier',
+          message: 'code_verifier is required',
+        },
+        { status: 400 },
+      );
+    }
+
+    // Create a mock user with an email based on the provider.
+    const email = auth_code.replace('google-', '');
+    const mockUser = createPopulatedSupabaseUser({ email });
+
+    // Create a session with the user.
+    const mockSession = createPopulatedSupabaseSession({
+      access_token: `mock-access-token-${createId()}`,
+      refresh_token: `mock-refresh-token-${createId()}`,
+      user: mockUser,
+    });
+
+    // Return the session data in the format expected by _sessionResponse.
+    return HttpResponse.json({
+      access_token: mockSession.access_token,
+      refresh_token: mockSession.refresh_token,
+      expires_in: mockSession.expires_in,
+      expires_at: mockSession.expires_at,
+      token_type: mockSession.token_type,
+      user: mockUser,
+    });
+  },
+);
+
 export const supabaseHandlers: RequestHandler[] = [
   getUserMock,
   signInWithOtpMock,
   verifyOtpMock,
+  exchangeCodeForSessionMock,
 ];

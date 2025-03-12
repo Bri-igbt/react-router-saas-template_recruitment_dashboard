@@ -168,5 +168,21 @@ describe('/register route action', () => {
     });
   });
 
-  // Note: Google registration tests would go here when implemented
+  describe(`${registerIntents.registerWithGoogle} intent`, () => {
+    const intent = registerIntents.registerWithGoogle;
+
+    test('given: a registration request with Google, should: return a redirect response to Supabase OAuth URL with code_verifier cookie', async () => {
+      const formData = toFormData({ intent });
+
+      const response = (await sendRequest({ formData })) as Response;
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toMatch(
+        /^https:\/\/.*\.supabase\.co\/auth\/v1\/authorize\?provider=google/,
+      );
+      expect(response.headers.get('Set-Cookie')).toMatch(
+        /sb-.*-auth-token-code-verifier=/,
+      );
+    });
+  });
 });

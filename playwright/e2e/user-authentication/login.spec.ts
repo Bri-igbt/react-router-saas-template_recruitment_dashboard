@@ -93,6 +93,26 @@ test.describe('login page', () => {
     });
   });
 
+  test.describe('google login', () => {
+    test('given: a logged out user, should: redirect to the google login page', async ({
+      page,
+    }) => {
+      await page.goto(path);
+
+      // Click the Google login button.
+      const googleLoginButton = page.getByRole('button', {
+        name: /google/i,
+      });
+      await googleLoginButton.click();
+
+      // Check that the user is redirected to the google login page.
+      await expect(
+        page.getByRole('heading', { name: /sign in/i, level: 1 }),
+      ).toBeVisible();
+      await expect(page.getByText(/sign in with google/i)).toBeVisible();
+    });
+  });
+
   test('given: an anonymous user, should: lack any automatically detectable accessibility issues', async ({
     page,
   }) => {

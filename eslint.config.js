@@ -47,7 +47,14 @@ export default tseslint.config(
       'unicorn/no-array-reduce': 'off',
       'unicorn/prevent-abbreviations': [
         'error',
-        { replacements: { params: false, props: false, utils: false } },
+        {
+          replacements: {
+            args: false,
+            params: false,
+            props: false,
+            utils: false,
+          },
+        },
       ],
     },
   },

@@ -154,3 +154,30 @@ Next, configure the email templates by clicking on **Emails** then on **Magic Li
 Click **Save Changes** to apply your changes.
 
 This code base is now setting up everything for Supabase. But if you want to handle your own sessions, you can still check out the archived French House Stack, which still maintains the code for your own custom sessions with cookie based auth.
+
+### Google OAuth
+
+This section is based on the Supabase documentation for [**Login With Google**](https://supabase.com/docs/guides/auth/social-login/auth-google), but has been enhanced for clarity because the Supabase documentation does not work out of the box.
+
+1. Create a new Google Cloud project. Go to the [Google Cloud Platform](https://console.cloud.google.com/home/dashboard) and create a new project if necessary.
+  - After creating the project, click on `Get Started`, enter your app name, choose your audience, provide your contact information, and agree to the Google API Services.
+2. Create your OAuth client.
+   - Under **Clients**, click `Create Credentials`.
+   - Choose `OAuth client ID`.
+   - Choose `Web application`.
+   - Click Create.
+3. Now edit your OAuth client with your URLs.
+   - Under **Authorized JavaScript origins**, add your site URL. (E.g. `http://localhost:5173`, and your production site URL.)
+   - Under **Authorized redirect URIs**, enter the callback URL from the [Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers). Expand the Google Auth Provider section to display it.
+      - You need to enter the Client ID and Client Secret in the Google Auth Provider section of the Supabase Dashboard, which you can find under **Additional Information** your OAuth client.
+      - The redirect URL is visible to your users. You can customize it by configuring [custom domains](https://supabase.com/docs/guides/platform/custom-domains).
+4. In the Google Cloud console, under **Data Access**, click `ADD OR REMOVE SCOPES`.
+   - Configure the following non-sensitive scopes:
+     - `.../auth/userinfo.email`
+     - `...auth/userinfo.profile`
+     - `openid`
+   - Click `Update`.
+5. In the Google Cloud console, Under **Branding** and then **Authorized Domains**, add your Supabase project's domain, which has the form `<PROJECT_ID>.supabase.co`.
+6. In your `.env` file, set the `APP_URL` to your local development URL (by default it's `http://localhost:5173`) or your production site URL.
+
+**Note:** [Here](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=environment&environment=server&queryGroups=framework&framework=remix#google-consent-screen) are more details on how to configure the Google consent screen to show your custom domain, and even your app's name and logo.
