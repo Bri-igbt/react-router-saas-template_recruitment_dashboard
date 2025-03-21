@@ -2,6 +2,7 @@ import type { Organization } from '@prisma/client';
 import { ChevronsUpDownIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import {
@@ -78,8 +79,9 @@ export function OrganizationSwitcher({
               <ChevronsUpDownIcon className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
-            className="min-w-56 rounded-lg"
+            className="max-w-(--radix-dropdown-menu-trigger-width) min-w-(--radix-dropdown-menu-trigger-width) rounded-lg md:max-w-80 md:min-w-56"
             align="start"
             side={isMobile ? 'bottom' : 'right'}
             sideOffset={4}
@@ -109,15 +111,17 @@ export function OrganizationSwitcher({
             ))}
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <PlusIcon className="size-4" />
-              </div>
+            <Link to="/organizations/new">
+              <DropdownMenuItem className="gap-2 p-2">
+                <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                  <PlusIcon className="size-4" />
+                </div>
 
-              <div className="text-muted-foreground font-medium">
-                {t('add-organization')}
-              </div>
-            </DropdownMenuItem>
+                <div className="text-muted-foreground font-medium">
+                  {t('add-organization')}
+                </div>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

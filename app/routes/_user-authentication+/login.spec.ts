@@ -127,7 +127,6 @@ describe('/login route action', () => {
     ])(
       'given: $given, should: return a 400 status code with an error message',
       async ({ body, expected }) => {
-        // @ts-expect-error - One of the cases is missing the `email` field.
         const formData = toFormData(body);
 
         const actual = await sendRequest({ formData });

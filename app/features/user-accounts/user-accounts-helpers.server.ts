@@ -1,6 +1,10 @@
 import type { UserAccount } from '@prisma/client';
 
-import { logout } from '../user-authentication/user-authentication-helpers.server';
+import {
+  logout,
+  requireUserIsAuthenticated,
+} from '../user-authentication/user-authentication-helpers.server';
+import { retrieveUserAccountFromDatabaseBySupabaseUserId } from './user-accounts-model.server';
 
 /**
  * Ensures that a user account is present.
@@ -18,4 +22,20 @@ export const throwIfUserAccountIsMissing = async <T extends UserAccount>(
   }
 
   return userAccount;
+};
+
+/**
+ * Ensures that a user account for the authenticated user exists.
+ *
+ * @param request - The incoming request object.
+ * @returns The user account.
+ * @throws Logs the user out if the user account is missing.
+ */
+export const requireAuthenticatedUserExists = async (request: Request) => {
+  const {
+    user: { id },
+    headers,
+  } = await requireUserIsAuthenticated(request);
+  const user = await retrieveUserAccountFromDatabaseBySupabaseUserId(id);
+  return { user: await throwIfUserAccountIsMissing(request, user), headers };
 };

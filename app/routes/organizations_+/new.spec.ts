@@ -1,12 +1,11 @@
 import { describe, expect, onTestFinished, test } from 'vitest';
 
-import { onboardingIntents } from '~/features/onboarding/onboarding-constants';
+import { createOrganizationIntent } from '~/features/organizations/create-organization/create-organization-form-card';
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
 import {
   deleteOrganizationFromDatabaseById,
   retrieveOrganizationWithMembershipsFromDatabaseBySlug,
   saveOrganizationToDatabase,
-  saveOrganizationWithOwnerToDatabase,
 } from '~/features/organizations/organizations-model.server';
 import { createPopulatedUserAccount } from '~/features/user-accounts/user-accounts-factories.server';
 import {
@@ -20,9 +19,9 @@ import { badRequest } from '~/utils/http-responses.server';
 import { slugify } from '~/utils/slugify.server';
 import { toFormData } from '~/utils/to-form-data';
 
-import { action } from './organization';
+import { action } from './new';
 
-const createUrl = () => `http://localhost:3000/onboarding/organization`;
+const createUrl = () => `http://localhost:3000/organizations/new`;
 
 async function sendAuthenticatedRequest({
   userAccount,
@@ -43,6 +42,7 @@ async function sendAuthenticatedRequest({
 
 async function setup(userAccount = createPopulatedUserAccount()) {
   await saveUserAccountToDatabase(userAccount);
+
   onTestFinished(async () => {
     await deleteUserAccountFromDatabaseById(userAccount.id);
   });
@@ -52,7 +52,7 @@ async function setup(userAccount = createPopulatedUserAccount()) {
 
 setupMockServerLifecycle(...supabaseHandlers);
 
-describe('/onboarding/organization route action', () => {
+describe('/organizations/new route action', () => {
   test('given: an unauthenticated request, should: throw a redirect to the login page', async () => {
     expect.assertions(2);
 
@@ -67,38 +67,14 @@ describe('/onboarding/organization route action', () => {
       if (error instanceof Response) {
         expect(error.status).toEqual(302);
         expect(error.headers.get('Location')).toEqual(
-          `/login?redirectTo=%2Fonboarding%2Forganization`,
+          `/login?redirectTo=%2Forganizations%2Fnew`,
         );
       }
     }
   });
 
-  test('given: a user who has completed onboarding, should: redirect to the organizations page', async () => {
-    expect.assertions(2);
-
-    const { userAccount } = await setup();
-    const organization = await saveOrganizationWithOwnerToDatabase({
-      organization: createPopulatedOrganization(),
-      userId: userAccount.id,
-    });
-    onTestFinished(async () => {
-      await deleteOrganizationFromDatabaseById(organization.id);
-    });
-
-    try {
-      await sendAuthenticatedRequest({ userAccount, formData: toFormData({}) });
-    } catch (error) {
-      if (error instanceof Response) {
-        expect(error.status).toEqual(302);
-        expect(error.headers.get('Location')).toEqual(
-          `/organizations/${organization.slug}`,
-        );
-      }
-    }
-  });
-
-  describe(`${onboardingIntents.createOrganization} intent`, () => {
-    const intent = onboardingIntents.createOrganization;
+  describe(`${createOrganizationIntent} intent`, () => {
+    const intent = createOrganizationIntent;
 
     test('given: a valid name for an organization, should: create organization and redirect to organization page', async () => {
       const { userAccount } = await setup();
@@ -144,7 +120,10 @@ describe('/onboarding/organization route action', () => {
       });
 
       // Try to create second organization with same name
-      const formData = toFormData({ intent, name: firstOrg.name });
+      const formData = toFormData({
+        intent,
+        name: firstOrg.name,
+      });
 
       const response = (await sendAuthenticatedRequest({
         userAccount,
@@ -213,7 +192,7 @@ describe('/onboarding/organization route action', () => {
         body: { intent, name: 'ab' } as const,
         expected: badRequest({
           errors: {
-            name: { message: 'onboarding:organization.name-min-length' },
+            name: { message: 'organizations:new.form.name-min-length' },
           },
         }),
       },
@@ -222,7 +201,7 @@ describe('/onboarding/organization route action', () => {
         body: { intent, name: 'a'.repeat(256) } as const,
         expected: badRequest({
           errors: {
-            name: { message: 'onboarding:organization.name-max-length' },
+            name: { message: 'organizations:new.form.name-max-length' },
           },
         }),
       },
@@ -231,7 +210,7 @@ describe('/onboarding/organization route action', () => {
         body: { intent, name: '   ' },
         expected: badRequest({
           errors: {
-            name: { message: 'onboarding:organization.name-min-length' },
+            name: { message: 'organizations:new.form.name-min-length' },
           },
         }),
       },
@@ -240,7 +219,7 @@ describe('/onboarding/organization route action', () => {
         body: { intent, name: '  a ' },
         expected: badRequest({
           errors: {
-            name: { message: 'onboarding:organization.name-min-length' },
+            name: { message: 'organizations:new.form.name-min-length' },
           },
         }),
       },

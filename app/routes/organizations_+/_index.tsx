@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { requireOnboardedUserAccountExists } from '~/features/onboarding/onboarding-helpers.server';
-import { retrieveActiveOrganizationsMembershipsFromDatabaseByUserId } from '~/features/organizations/organizations-model.server';
 import { cn } from '~/lib/utils';
 import { getPageTitle } from '~/utils/get-page-title.server';
 import i18next from '~/utils/i18next.server';
@@ -26,10 +25,10 @@ export const handle = { i18n: 'organizations' };
 
 export async function loader({ request }: Route.LoaderArgs) {
   const {
-    user: { user },
+    data: { user },
     t,
   } = await promiseHash({
-    user: requireOnboardedUserAccountExists(request),
+    data: requireOnboardedUserAccountExists(request),
     t: i18next.getFixedT(request, ['organizations', 'common']),
   });
 
@@ -37,10 +36,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect(`/organizations/${user.memberships[0].organization.slug}`);
   }
 
-  const memberships =
-    await retrieveActiveOrganizationsMembershipsFromDatabaseByUserId(user.id);
-
-  return { memberships, title: getPageTitle(t, 'organizationsList.title') };
+  return {
+    memberships: user.memberships,
+    title: getPageTitle(t, 'organizationsList.title'),
+  };
 }
 
 export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];

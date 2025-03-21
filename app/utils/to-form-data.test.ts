@@ -74,4 +74,19 @@ describe('toFormData()', () => {
 
     expect(actual).toEqual(expected);
   });
+
+  test('given: an object with undefined values, should: skip undefined values in form data', () => {
+    const payload = {
+      name: 'John Doe',
+      age: undefined,
+      file: new Blob(['content'], { type: 'text/plain' }),
+    };
+
+    const actual = toFormData(payload);
+    const expected = new FormData();
+    expected.append('name', 'John Doe');
+    expected.append('file', new Blob(['content'], { type: 'text/plain' }));
+
+    expect(actual).toEqual(expected);
+  });
 });

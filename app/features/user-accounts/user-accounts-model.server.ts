@@ -43,6 +43,18 @@ export async function retrieveUserAccountFromDatabaseByEmail(
 }
 
 /**
+ * Retrieves a user account by their Supabase ID.
+ *
+ * @param supabaseUserId The Supabase ID of the user account.
+ * @returns The user account or null.
+ */
+export async function retrieveUserAccountFromDatabaseBySupabaseUserId(
+  supabaseUserId: UserAccount['supabaseUserId'],
+) {
+  return prisma.userAccount.findUnique({ where: { supabaseUserId } });
+}
+
+/**
  * Retrieves a user account and their active organization memberships by
  * Supabase ID.
  *

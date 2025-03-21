@@ -168,7 +168,6 @@ describe('/onboarding/user-account route action', () => {
           await deleteUserAccountFromDatabaseById(userAccount.id);
         });
 
-        // @ts-expect-error - Some test cases intentionally omit required fields
         const formData = toFormData(body);
 
         const actual = await sendAuthenticatedRequest({

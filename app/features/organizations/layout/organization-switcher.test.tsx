@@ -78,7 +78,9 @@ describe('OrganizationSwitcher Component', () => {
     }
 
     // Verify add organization button is displayed.
-    expect(screen.getByText(/add organization/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /add organization/i }),
+    ).toHaveAttribute('href', '/organizations/new');
 
     // Press escape to close the dropdown.
     await user.keyboard('{Escape}');

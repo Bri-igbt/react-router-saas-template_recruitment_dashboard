@@ -49,33 +49,6 @@ export async function saveOrganizationWithOwnerToDatabase({
 /* READ */
 
 /**
- * Retrieves all organizations where the user has an active membership with
- * their role. Active memberships are those that are either not deactivated or
- * have a deactivation date in the future.
- *
- * @param userId - The id of the user.
- * @returns An array of organizations where the user is an active member,
- * including their role.
- */
-export async function retrieveActiveOrganizationsMembershipsFromDatabaseByUserId(
-  userId: UserAccount['id'],
-) {
-  return prisma.organizationMembership.findMany({
-    where: {
-      memberId: userId,
-      // eslint-disable-next-line unicorn/no-null
-      OR: [{ deactivatedAt: null }, { deactivatedAt: { gt: new Date() } }],
-    },
-    select: {
-      role: true,
-      organization: {
-        select: { id: true, name: true, slug: true, imageUrl: true },
-      },
-    },
-  });
-}
-
-/**
  * Retrieves an organization by its slug with memberships.
  *
  * @param slug - The slug of the organization to retrieve.
