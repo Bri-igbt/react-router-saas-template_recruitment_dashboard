@@ -1,6 +1,6 @@
 import { describe, expect, onTestFinished, test } from 'vitest';
 
-import { createOrganizationIntent } from '~/features/organizations/create-organization/create-organization-form-card';
+import { CREATE_ORGANIZATION_INTENT } from '~/features/organizations/create-organization/create-organization-constants';
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
 import {
   deleteOrganizationFromDatabaseById,
@@ -73,8 +73,8 @@ describe('/organizations/new route action', () => {
     }
   });
 
-  describe(`${createOrganizationIntent} intent`, () => {
-    const intent = createOrganizationIntent;
+  describe(`${CREATE_ORGANIZATION_INTENT} intent`, () => {
+    const intent = CREATE_ORGANIZATION_INTENT;
 
     test('given: a valid name for an organization, should: create organization and redirect to organization page', async () => {
       const { userAccount } = await setup();

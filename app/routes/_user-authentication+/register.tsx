@@ -26,7 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { title: getPageTitle(t, 'register.page-title') };
 }
 
-export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
 
 export async function action(args: Route.ActionArgs) {
   return registerAction(args);

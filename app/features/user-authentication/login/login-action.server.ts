@@ -9,10 +9,12 @@ import { tooManyRequests, unauthorized } from '~/utils/http-responses.server';
 import i18next from '~/utils/i18next.server';
 import { validateFormData } from '~/utils/validate-form-data.server';
 
-import { loginIntents } from '../user-authentication-constants';
 import { requireUserIsAnonymous } from '../user-authentication-helpers.server';
-import type { EmailLoginErrors } from './login-form-card';
-import { loginWithEmailSchema, loginWithGoogleSchema } from './login-form-card';
+import {
+  type EmailLoginErrors,
+  loginWithEmailSchema,
+  loginWithGoogleSchema,
+} from './login-schemas';
 import type { Route } from '.react-router/types/app/routes/_user-authentication+/+types/login';
 
 export type LoginActionData =
@@ -34,7 +36,7 @@ export async function loginAction({
     const body = await validateFormData(request, loginSchema);
 
     switch (body.intent) {
-      case loginIntents.loginWithEmail: {
+      case 'loginWithEmail': {
         const userAccount = await retrieveUserAccountFromDatabaseByEmail(
           body.email,
         );
@@ -76,7 +78,7 @@ export async function loginAction({
 
         return { ...data, email: body.email };
       }
-      case loginIntents.loginWithGoogle: {
+      case 'loginWithGoogle': {
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {

@@ -9,7 +9,7 @@ import {
 } from '~/features/user-accounts/user-accounts-model.server';
 import { stringifyAuthCodeData } from '~/test/mocks/handlers/supabase/auth';
 import {
-  setupUserWithOrgAndAddAsMember,
+  createUserWithOrgAndAddAsMember,
   teardownOrganizationAndMember,
 } from '~/test/test-utils';
 
@@ -67,7 +67,7 @@ test.describe(`${path} API route`, () => {
     page,
   }) => {
     // Create an existing user account first.
-    const { user, organization } = await setupUserWithOrgAndAddAsMember();
+    const { user, organization } = await createUserWithOrgAndAddAsMember();
 
     // Set up the code verifier cookie.
     await setupCodeVerifierCookie({ page });

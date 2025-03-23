@@ -1,6 +1,6 @@
 import { describe, expect, onTestFinished, test } from 'vitest';
 
-import { onboardingIntents } from '~/features/onboarding/onboarding-constants';
+import { ONBOARDING_ORGANIZATION_INTENT } from '~/features/onboarding/organization/onboarding-organization-consants';
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
 import {
   deleteOrganizationFromDatabaseById,
@@ -97,8 +97,8 @@ describe('/onboarding/organization route action', () => {
     }
   });
 
-  describe(`${onboardingIntents.createOrganization} intent`, () => {
-    const intent = onboardingIntents.createOrganization;
+  describe(`${ONBOARDING_ORGANIZATION_INTENT} intent`, () => {
+    const intent = ONBOARDING_ORGANIZATION_INTENT;
 
     test('given: a valid name for an organization, should: create organization and redirect to organization page', async () => {
       const { userAccount } = await setup();

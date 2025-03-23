@@ -9,13 +9,12 @@ import { conflict, tooManyRequests } from '~/utils/http-responses.server';
 import i18next from '~/utils/i18next.server';
 import { validateFormData } from '~/utils/validate-form-data.server';
 
-import { registerIntents } from '../user-authentication-constants';
 import { requireUserIsAnonymous } from '../user-authentication-helpers.server';
-import type { EmailRegistrationErrors } from './registration-form-card';
 import {
+  type EmailRegistrationErrors,
   registerWithEmailSchema,
   registerWithGoogleSchema,
-} from './registration-form-card';
+} from './registration-schemas';
 import type { Route } from '.react-router/types/app/routes/_user-authentication+/+types/login';
 
 export type RegisterActionData =
@@ -37,7 +36,7 @@ export async function registerAction({
     const body = await validateFormData(request, registerSchema);
 
     switch (body.intent) {
-      case registerIntents.registerWithEmail: {
+      case 'registerWithEmail': {
         const userAccount = await retrieveUserAccountFromDatabaseByEmail(
           body.email,
         );
@@ -79,7 +78,7 @@ export async function registerAction({
 
         return { ...data, email: body.email };
       }
-      case registerIntents.registerWithGoogle: {
+      case 'registerWithGoogle': {
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {

@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
   badRequest,
   conflict,
+  forbidden,
   notFound,
   tooManyRequests,
   unauthorized,
@@ -63,6 +64,38 @@ describe('unauthorized()', () => {
     expect((response.init?.headers as Headers).get('WWW-Authenticate')).toEqual(
       'Bearer',
     );
+  });
+});
+
+describe('forbidden()', () => {
+  test('given: no arguments, should: return a 403 status with a message', () => {
+    const response = forbidden();
+
+    expect(response.init?.status).toEqual(403);
+    expect(response.data).toEqual({ message: 'Forbidden' });
+  });
+
+  test('given: custom error object, should: return a 403 status with the custom error object', () => {
+    const customErrors = { reason: 'insufficient-permissions' };
+    const response = forbidden(customErrors);
+
+    expect(response.init?.status).toEqual(403);
+    expect(response.data).toEqual({ message: 'Forbidden', ...customErrors });
+  });
+
+  test('given: custom data and headers, should: return a 403 status with the custom data and the headers', () => {
+    const headers = new Headers({ 'X-Forbidden-Reason': 'No Access' });
+    const customErrors = {
+      resource: 'admin-panel',
+      detail: 'requires admin role',
+    };
+    const response = forbidden(customErrors, { headers });
+
+    expect(response.init?.status).toEqual(403);
+    expect(response.data).toEqual({ message: 'Forbidden', ...customErrors });
+    expect(
+      (response.init?.headers as Headers).get('X-Forbidden-Reason'),
+    ).toEqual('No Access');
   });
 });
 

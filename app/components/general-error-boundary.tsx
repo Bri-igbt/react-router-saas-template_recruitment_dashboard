@@ -38,7 +38,11 @@ export function GeneralErrorBoundary({
       description={error.data as string}
     />
   ),
-  statusHandlers,
+  statusHandlers = {
+    404: ({ error }) => {
+      throw error;
+    },
+  },
   unexpectedErrorHandler = error => (
     <ErrorMessage title="Oh snap!" description={getErrorMessage(error)} />
   ),

@@ -57,6 +57,31 @@ export function unauthorized<T extends NestedJSON>(
 }
 
 /**
+ * Returns a 403 Forbidden error.
+ *
+ * @returns A response with the 403 status code and a message.
+ */
+export function forbidden(): DataWithResponseInit<{ message: string }>;
+/**
+ * Returns a 403 Forbidden error.
+ *
+ * @param errors - An object containing custom error messages.
+ * @returns A response with the 403 status code and the error messages.
+ */
+export function forbidden<T extends NestedJSON>(
+  errors: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } & T>;
+export function forbidden<T extends NestedJSON>(
+  errors?: T,
+  init?: Omit<ResponseInit, 'status'>,
+): DataWithResponseInit<{ message: string } | ({ message: string } & T)> {
+  return errors
+    ? data({ message: 'Forbidden', ...errors }, { ...init, status: 403 })
+    : data({ message: 'Forbidden' }, { status: 403 });
+}
+
+/**
  * Returns a 409 Conflict error.
  *
  * @returns A response with the 409 status code and a message.

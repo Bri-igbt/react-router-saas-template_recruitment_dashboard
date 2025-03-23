@@ -6,8 +6,8 @@ import { slugify } from '~/utils/slugify.server';
 import { validateFormData } from '~/utils/validate-form-data.server';
 
 import { requireUserNeedsOnboarding } from '../onboarding-helpers.server';
-import type { OnboardingOrganizationErrors } from './onboarding-organization-form-card';
-import { onboardingOrganizationSchema } from './onboarding-organization-form-card';
+import type { OnboardingOrganizationErrors } from './onboarding-organization-schemas';
+import { onboardingOrganizationSchema } from './onboarding-organization-schemas';
 import type { Route } from '.react-router/types/app/routes/onboarding+/+types/organization';
 
 export async function onboardingOrganizationAction({
@@ -16,6 +16,10 @@ export async function onboardingOrganizationAction({
   try {
     const { user, headers } = await requireUserNeedsOnboarding(request);
     const data = await validateFormData(request, onboardingOrganizationSchema);
+
+    if (typeof data.name !== 'string') {
+      throw new TypeError('Organization name must be a string');
+    }
 
     const organization = await saveOrganizationWithOwnerToDatabase({
       organization: { name: data.name, slug: slugify(data.name) },

@@ -5,8 +5,10 @@ import { getIsDataWithResponseInit } from '~/utils/get-is-data-with-response-ini
 import { validateFormData } from '~/utils/validate-form-data.server';
 
 import { requireUserNeedsOnboarding } from '../onboarding-helpers.server';
-import type { OnboardingUserAccountErrors } from './onboarding-user-account-form-card';
-import { onboardingUserAccountSchema } from './onboarding-user-account-form-card';
+import {
+  type OnboardingUserAccountErrors,
+  onboardingUserAccountSchema,
+} from './onboarding-user-account-schemas';
 import type { Route } from '.react-router/types/app/routes/onboarding+/+types/user-account';
 
 export async function onboardingUserAccountAction({
@@ -15,6 +17,10 @@ export async function onboardingUserAccountAction({
   try {
     const { headers, user } = await requireUserNeedsOnboarding(request);
     const data = await validateFormData(request, onboardingUserAccountSchema);
+
+    if (typeof data.name !== 'string') {
+      throw new TypeError('User name must be a string');
+    }
 
     await updateUserAccountInDatabaseById({
       id: user.id,

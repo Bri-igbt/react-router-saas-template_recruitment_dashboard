@@ -321,6 +321,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<'main'>) {
       className={cn(
         'bg-background relative flex w-full flex-1 flex-col',
         'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
+        'peer-data-[variant=sidebar]:[&_[data-slot=secondary-sidebar-header]]:dark:bg-sidebar', // Add `data-slot="secondary-sidebar-header"` to any secondary sidebar header to give it a nice background color on dark mode for the sidebar varient.
         className,
       )}
       {...props}

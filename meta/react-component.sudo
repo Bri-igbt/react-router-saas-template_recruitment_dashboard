@@ -181,6 +181,7 @@ interface ComponentGenerator {
     Consider error handling and edge cases.
     You are generating a component for a React Router V7 app.
     Return structured requirements list.
+    Scan the codebase for existing components, factories and test helpers.
   }
 
   fn determineComponentStructure(requirements) {
@@ -195,10 +196,11 @@ interface ComponentGenerator {
     Use Vitest with describe, test, expect.
     Use React Testing Library.
     Use userEvent for interactions.
-    Follow "given ...: should ..." prose format.
+    User `createRoutesStub` for React Router V7 features (e.g. Link, Form, etc.).
+    Follow the "given ...: should ..." prose format.
     Test accessibility features.
     Test error states and edge cases.
-    Generate realistic test data with faker.
+    Generate realistic test data with faker or use factory functions.
     Return test suites.
   }
 
@@ -216,9 +218,10 @@ interface ComponentGenerator {
     Always use TypeScript.
     Always consider accessibility.
     Always write tests first.
-    Always use faker for test data.
+    Always use faker or factories for test data.
     Always export component types.
     Always use TailwindCSS for styling.
+    Scan the codebase for existing components, factories and test helpers.
     Use container/display pattern unless props would be awkward.
     Favor native HTML elements.
     Use Radix UI for complex patterns.

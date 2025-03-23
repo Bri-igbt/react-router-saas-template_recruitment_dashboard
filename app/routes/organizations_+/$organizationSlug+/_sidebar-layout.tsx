@@ -2,16 +2,14 @@ import type { ShouldRevalidateFunctionArgs, UIMatch } from 'react-router';
 import { href, Outlet, redirect } from 'react-router';
 
 import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
-import { requireOnboardedUserAccountExists } from '~/features/onboarding/onboarding-helpers.server';
-import {
-  AppHeader,
-  findHeaderTitle,
-} from '~/features/organizations/layout/app-header';
+import { AppHeader } from '~/features/organizations/layout/app-header';
 import { AppSidebar } from '~/features/organizations/layout/app-sidebar';
+import { findHeaderTitle } from '~/features/organizations/layout/layout-helpers';
 import {
   getSidebarState,
   mapOnboardingUserToOrganizationLayoutProps,
 } from '~/features/organizations/layout/layout-helpers.server';
+import { requireUserIsMemberOfOrganization } from '~/features/organizations/organizations-helpers.server';
 
 import type { Route } from './+types/_sidebar-layout';
 
@@ -43,7 +41,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     );
   }
 
-  const { user, headers } = await requireOnboardedUserAccountExists(request);
+  const { user, headers } = await requireUserIsMemberOfOrganization(
+    request,
+    params.organizationSlug,
+  );
   const defaultSidebarOpen = getSidebarState(request);
 
   return {

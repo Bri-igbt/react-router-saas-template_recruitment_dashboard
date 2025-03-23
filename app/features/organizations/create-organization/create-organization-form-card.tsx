@@ -28,27 +28,10 @@ import { Input } from '~/components/ui/input';
 import { cn } from '~/lib/utils';
 import { toFormData } from '~/utils/to-form-data';
 
-export const createOrganizationIntent = 'createOrganization';
+import { CREATE_ORGANIZATION_INTENT } from './create-organization-constants';
+import type { CreateOrganizationFormSchema } from './create-organization-schemas';
+import { createOrganizationFormSchema } from './create-organization-schemas';
 
-export const createOrganizationFormSchema = z.object({
-  intent: z.literal(createOrganizationIntent),
-  name: z
-    .string({
-      invalid_type_error: 'organizations:new.form.name-must-be-string',
-    })
-    .trim()
-    .min(3, 'organizations:new.form.name-min-length')
-    .max(255, 'organizations:new.form.name-max-length'),
-  logo: z
-    .instanceof(File, {
-      message: 'organizations:new.form.logo-must-be-file',
-    })
-    .optional(),
-});
-
-type CreateOrganizationFormSchema = z.infer<
-  typeof createOrganizationFormSchema
->;
 export type CreateOrganizationFormErrors =
   FieldErrors<CreateOrganizationFormSchema>;
 
@@ -67,7 +50,7 @@ export function CreateOrganizationFormCard({
   const form = useForm<CreateOrganizationFormSchema>({
     resolver: zodResolver(createOrganizationFormSchema),
     defaultValues: {
-      intent: createOrganizationIntent,
+      intent: CREATE_ORGANIZATION_INTENT,
       name: '',
       logo: undefined,
     },
@@ -132,15 +115,17 @@ export function CreateOrganizationFormCard({
 
                       <FormControl>
                         <DragAndDrop
+                          accept="image/jpeg,image/png"
                           className={cn(
                             form.formState.errors.logo && 'border-destructive',
                           )}
+                          id="organizationLogo"
+                          multiple={false}
                           name="logo"
                           onFileChosen={file => {
                             onChange(file);
                             form.setValue('logo', file);
                           }}
-                          id="organizationLogo"
                         />
                       </FormControl>
 

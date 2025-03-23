@@ -60,7 +60,7 @@ test.describe('organization layout', () => {
     await teardownOrganizationAndMember({ organization, user });
   });
 
-  test.skip('given: a logged in user who is onboarded but NOT a member of the organization, should: show a 404 not found page', async ({
+  test('given: a logged in user who is onboarded but NOT a member of the organization, should: show a 404 not found page', async ({
     page,
   }) => {
     const { organization, user } = await setupOrganizationAndLoginAsMember({
@@ -72,7 +72,6 @@ test.describe('organization layout', () => {
     await page.goto(`/organizations/${otherOrganization.slug}`);
 
     // Verify 404 page content
-    await expect(page).toHaveTitle(/404 | french house stack/i);
     await expect(
       page.getByRole('heading', { name: /page not found/i, level: 1 }),
     ).toBeVisible();
@@ -81,8 +80,9 @@ test.describe('organization layout', () => {
       page.getByText(/sorry, we couldn't find the page you're looking for/i),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /go back home/i }),
+      page.getByRole('link', { name: /return home/i }),
     ).toHaveAttribute('href', '/');
+    await expect(page).toHaveTitle(/404/i);
 
     await teardownOrganizationAndMember({ organization, user });
     await deleteOrganizationFromDatabaseById(otherOrganization.id);

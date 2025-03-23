@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2Icon } from 'lucide-react';
-import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form, useSubmit } from 'react-router';
@@ -26,24 +25,12 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 
-import { onboardingIntents } from '../onboarding-constants';
-
-export const onboardingOrganizationSchema = z.object({
-  name: z
-    .string({
-      invalid_type_error: 'onboarding:organization.name-must-be-string',
-    })
-    .trim()
-    .min(3, 'onboarding:organization.name-min-length')
-    .max(255, 'onboarding:organization.name-max-length'),
-  intent: z.literal(onboardingIntents.createOrganization),
-});
-
-type OnboardingOrganizationSchema = z.infer<
-  typeof onboardingOrganizationSchema
->;
-export type OnboardingOrganizationErrors =
-  FieldErrors<OnboardingOrganizationSchema>;
+import { ONBOARDING_ORGANIZATION_INTENT } from './onboarding-organization-consants';
+import type {
+  OnboardingOrganizationErrors,
+  OnboardingOrganizationSchema,
+} from './onboarding-organization-schemas';
+import { onboardingOrganizationSchema } from './onboarding-organization-schemas';
 
 export type OnboardingOrganizationFormCardProps = {
   errors?: OnboardingOrganizationErrors;
@@ -57,10 +44,10 @@ export function OnboardingOrganizationFormCard({
   const { t } = useTranslation('onboarding', { keyPrefix: 'organization' });
   const submit = useSubmit();
 
-  const form = useForm<z.infer<typeof onboardingOrganizationSchema>>({
+  const form = useForm<OnboardingOrganizationSchema>({
     resolver: zodResolver(onboardingOrganizationSchema),
     defaultValues: {
-      intent: onboardingIntents.createOrganization,
+      intent: ONBOARDING_ORGANIZATION_INTENT,
       name: '',
     },
     errors,
@@ -125,7 +112,7 @@ export function OnboardingOrganizationFormCard({
           form="organization-form"
           name="intent"
           type="submit"
-          value={onboardingIntents.createOrganization}
+          value={ONBOARDING_ORGANIZATION_INTENT}
         >
           {isCreatingOrganization ? (
             <>

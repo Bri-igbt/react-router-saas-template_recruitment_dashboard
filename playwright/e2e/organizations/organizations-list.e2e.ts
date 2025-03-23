@@ -96,7 +96,7 @@ test.describe('organizations list page', () => {
     await page.goto(path);
 
     // Verify page content
-    await expect(page).toHaveTitle(/organization list | french house stack/i);
+    await expect(page).toHaveTitle(/organization list/i);
     await expect(
       page.getByRole('heading', { name: /organization list/i, level: 1 }),
     ).toBeVisible();

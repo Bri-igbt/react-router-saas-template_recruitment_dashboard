@@ -3,10 +3,10 @@ import { href, useNavigation } from 'react-router';
 import { promiseHash } from 'remix-utils/promise';
 
 import { GeneralErrorBoundary } from '~/components/general-error-boundary';
-import { onboardingIntents } from '~/features/onboarding/onboarding-constants';
 import { requireUserNeedsOnboarding } from '~/features/onboarding/onboarding-helpers.server';
 import { OnboardingSteps } from '~/features/onboarding/onboarding-steps';
 import { onboardingOrganizationAction } from '~/features/onboarding/organization/onboarding-organization-action.server';
+import { ONBOARDING_ORGANIZATION_INTENT } from '~/features/onboarding/organization/onboarding-organization-consants';
 import { OnboardingOrganizationFormCard } from '~/features/onboarding/organization/onboarding-organization-form-card';
 import { getFormErrors } from '~/utils/get-form-errors';
 import { getPageTitle } from '~/utils/get-page-title.server';
@@ -25,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { title: getPageTitle(t, 'organization.title') };
 }
 
-export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
 
 export async function action(args: Route.ActionArgs) {
   return await onboardingOrganizationAction(args);
@@ -37,7 +37,7 @@ export default function OrganizationOnboardingRoute({
   const { t } = useTranslation('onboarding');
   const navigation = useNavigation();
   const isCreatingOrganization =
-    navigation.formData?.get('intent') === onboardingIntents.createOrganization;
+    navigation.formData?.get('intent') === ONBOARDING_ORGANIZATION_INTENT;
   const errors = getFormErrors(actionData);
 
   return (

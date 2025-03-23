@@ -3,8 +3,9 @@ import { describe, expect, test } from 'vitest';
 import { createRoutesStub, render, screen } from '~/test/react-test-utils';
 import type { Factory } from '~/utils/types';
 
-import type { EmailLoginErrors, LoginFormCardProps } from './login-form-card';
+import type { LoginFormCardProps } from './login-form-card';
 import { LoginFormCard } from './login-form-card';
+import type { EmailLoginErrors } from './login-schemas';
 
 const createProps: Factory<LoginFormCardProps> = ({
   errors,

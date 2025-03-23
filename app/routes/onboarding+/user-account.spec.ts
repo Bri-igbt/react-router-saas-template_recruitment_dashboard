@@ -1,6 +1,6 @@
 import { describe, expect, onTestFinished, test } from 'vitest';
 
-import { onboardingIntents } from '~/features/onboarding/onboarding-constants';
+import { ONBOARDING_USER_ACCOUNT_INTENT } from '~/features/onboarding/user-account/onboarding-user-account-constants';
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
 import {
   deleteOrganizationFromDatabaseById,
@@ -94,8 +94,8 @@ describe('/onboarding/user-account route action', () => {
     }
   });
 
-  describe(`${onboardingIntents.createUserAccount} intent`, () => {
-    const intent = onboardingIntents.createUserAccount;
+  describe(`${ONBOARDING_USER_ACCOUNT_INTENT} intent`, () => {
+    const intent = ONBOARDING_USER_ACCOUNT_INTENT;
 
     test('given: a valid name for a user without organizations, should: update name and redirect to organization onboarding', async () => {
       const userAccount = createPopulatedUserAccount({ name: '' });

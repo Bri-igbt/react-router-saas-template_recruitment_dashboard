@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { stringifyTokenHashData } from '~/test/mocks/handlers/supabase/auth';
 import {
-  setupUserWithOrgAndAddAsMember,
+  createUserWithOrgAndAddAsMember,
   teardownOrganizationAndMember,
 } from '~/test/test-utils';
 
@@ -15,7 +15,7 @@ test.describe(`${path} API route`, () => {
     page,
   }) => {
     // Create a test user account.
-    const { user, organization } = await setupUserWithOrgAndAddAsMember();
+    const { user, organization } = await createUserWithOrgAndAddAsMember();
 
     // Mock token hash.
     const tokenHash = stringifyTokenHashData({
@@ -59,7 +59,7 @@ test.describe(`${path} API route`, () => {
     page,
   }) => {
     // Create a test user account.
-    const { user, organization } = await setupUserWithOrgAndAddAsMember();
+    const { user, organization } = await createUserWithOrgAndAddAsMember();
 
     // Log in the user using cookies.
     await loginByCookie({ page, user });

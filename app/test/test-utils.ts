@@ -1,8 +1,5 @@
-import {
-  type Organization,
-  OrganizationMembershipRole,
-  type UserAccount,
-} from '@prisma/client';
+import type { Organization, UserAccount } from '@prisma/client';
+import { OrganizationMembershipRole } from '@prisma/client';
 
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
 import {
@@ -111,10 +108,10 @@ export async function createAuthenticatedRequest({
  * objects to be saved.
  * @returns - An object containing the saved organization and user.
  */
-export async function setupUserWithOrgAndAddAsMember({
+export async function createUserWithOrgAndAddAsMember({
   organization = createPopulatedOrganization(),
   user = createPopulatedUserAccount(),
-  role = OrganizationMembershipRole.member,
+  role = OrganizationMembershipRole.member as OrganizationMembershipRole,
 } = {}) {
   // Save user account and organization and add user as a member.
   await Promise.all([

@@ -11,6 +11,8 @@ import {
 
 import type { Route } from './+types/_settings-layout';
 
+export const handle = { i18n: 'organizations' };
+
 export function loader({ request }: Route.LoaderArgs) {
   const pathname = new URL(request.url).pathname;
   if (pathname.endsWith('/settings')) {
@@ -32,11 +34,20 @@ export default function SettingsLayout({ params }: Route.ComponentProps) {
         organizationSlug: params.organizationSlug,
       }),
     },
+    {
+      title: t('team-members'),
+      url: href('/organizations/:organizationSlug/settings/members', {
+        organizationSlug: params.organizationSlug,
+      }),
+    },
   ];
 
   return (
     <>
-      <div className="bg-sidebar flex h-[calc(var(--header-height)-0.5rem)] items-center border-b px-4 lg:px-6">
+      <div
+        className="flex h-[calc(var(--header-height)-0.5rem)] items-center border-b px-4 lg:px-6"
+        data-slot="secondary-sidebar-header"
+      >
         <NavigationMenu aria-label={t('settings-nav')} className="-ml-1.5">
           <NavigationMenuList className="gap-2 *:data-[slot=navigation-menu-item]:h-7 **:data-[slot=navigation-menu-link]:py-1 **:data-[slot=navigation-menu-link]:font-medium">
             {routes.map(route => (

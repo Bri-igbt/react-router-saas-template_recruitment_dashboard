@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2Icon } from 'lucide-react';
-import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form, useSubmit } from 'react-router';
@@ -26,22 +25,12 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 
-import { onboardingIntents } from '../onboarding-constants';
-
-export const onboardingUserAccountSchema = z.object({
-  name: z
-    .string({
-      invalid_type_error: 'onboarding:user-account.name-must-be-string',
-    })
-    .trim()
-    .min(2, 'onboarding:user-account.name-min-length')
-    .max(128, 'onboarding:user-account.name-max-length'),
-  intent: z.literal(onboardingIntents.createUserAccount),
-});
-
-type OnboardingUserAccountSchema = z.infer<typeof onboardingUserAccountSchema>;
-export type OnboardingUserAccountErrors =
-  FieldErrors<OnboardingUserAccountSchema>;
+import { ONBOARDING_USER_ACCOUNT_INTENT } from './onboarding-user-account-constants';
+import type {
+  OnboardingUserAccountErrors,
+  OnboardingUserAccountSchema,
+} from './onboarding-user-account-schemas';
+import { onboardingUserAccountSchema } from './onboarding-user-account-schemas';
 
 export type OnboardingUserAccountFormCardProps = {
   errors?: OnboardingUserAccountErrors;
@@ -55,10 +44,10 @@ export function OnboardingUserAccountFormCard({
   const { t } = useTranslation('onboarding', { keyPrefix: 'user-account' });
   const submit = useSubmit();
 
-  const form = useForm<z.infer<typeof onboardingUserAccountSchema>>({
+  const form = useForm<OnboardingUserAccountSchema>({
     resolver: zodResolver(onboardingUserAccountSchema),
     defaultValues: {
-      intent: onboardingIntents.createUserAccount,
+      intent: ONBOARDING_USER_ACCOUNT_INTENT,
       name: '',
     },
     errors,
@@ -123,7 +112,7 @@ export function OnboardingUserAccountFormCard({
           form="user-account-form"
           name="intent"
           type="submit"
-          value={onboardingIntents.createUserAccount}
+          value={ONBOARDING_USER_ACCOUNT_INTENT}
         >
           {isCreatingUserAccount ? (
             <>

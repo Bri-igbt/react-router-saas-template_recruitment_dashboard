@@ -49,6 +49,10 @@ export default tseslint.config(
               from: 'file',
               name: 'DataWithResponseInit',
             },
+            {
+              from: 'file',
+              name: 'ErrorResponse',
+            },
             // For the built-in Response type from lib.dom.d.ts
             {
               from: 'lib',

@@ -22,7 +22,7 @@ declare global {
 }
 
 async function activateMsw() {
-  if (ENV.CLIENT_MOCKS === 'true') {
+  if (ENV?.CLIENT_MOCKS === 'true') {
     const { worker } = await import('./test/mocks/browser');
 
     return worker.start({ onUnhandledRequest });

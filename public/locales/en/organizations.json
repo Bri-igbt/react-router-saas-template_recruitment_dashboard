@@ -42,7 +42,7 @@
   },
   "new": {
     "form": {
-      "card-description": "Tell us about your organization. You’ll still remain a member of your current organization, with the ability to switch between them anytime.",
+      "card-description": "Tell us about your organization. You'll still remain a member of your current organization, with the ability to switch between them anytime.",
       "card-title": "Create a new organization",
       "logo-invalid-mime-type": "Invalid file type. Allowed file types are JPG, PNG, and JPEG.",
       "logo-label": "Logo",
@@ -67,9 +67,42 @@
     "title": "Organization List"
   },
   "settings": {
+    "general": {
+      "danger-zone": {
+        "cancel": "Cancel",
+        "delete-button": "Delete organization",
+        "delete-description": "Once deleted, it will be gone forever. Please be certain.",
+        "delete-this-organization": "Delete this organization",
+        "delete-title": "Delete this organization",
+        "deleting": "Deleting organization...",
+        "dialog-description": "Are you sure you want to delete this organization? This action cannot be undone.",
+        "dialog-title": "Delete Organization",
+        "title": "Danger Zone"
+      },
+      "description": "General settings for this organization.",
+      "form": {
+        "logo-invalid-mime-type": "Invalid file type. Allowed file types are JPG, PNG, and JPEG.",
+        "logo-label": "Organization logo",
+        "logo-must-be-file": "Logo must be a file.",
+        "name-description": "Your organization's public display name. <1>Warning:</1> Changing the name will break all existing links to your organization.",
+        "name-label": "Organization name",
+        "name-max-length": "Organization name must be less than 255 characters long.",
+        "name-min-length": "Organization name must be at least 3 characters long.",
+        "name-must-be-string": "Organization name must be a string.",
+        "name-placeholder": "Organization name ...",
+        "save": "Save changes",
+        "saving": "Saving changes ..."
+      },
+      "page-title": "General",
+      "toast": {
+        "organization-deleted": "Organization has been deleted",
+        "organization-profile-updated": "Organization has been updated"
+      }
+    },
     "layout": {
       "general": "General",
-      "settings-nav": "Settings navigation"
+      "settings-nav": "Settings navigation",
+      "team-members": "Team Members"
     }
   }
 }

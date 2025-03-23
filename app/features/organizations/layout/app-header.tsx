@@ -1,14 +1,9 @@
 import { BellIcon } from 'lucide-react';
-import { findLast, has, pipe, prop } from 'ramda';
 import { useTranslation } from 'react-i18next';
-import type { UIMatch } from 'react-router';
 
 import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 import { SidebarTrigger } from '~/components/ui/sidebar';
-
-export const findHeaderTitle = (matches: UIMatch<{ headerTitle?: string }>[]) =>
-  findLast(pipe(prop('data'), has('headerTitle')), matches)?.data?.headerTitle;
 
 export type AppHeaderProps = {
   title?: string;

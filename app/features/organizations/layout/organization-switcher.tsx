@@ -62,7 +62,7 @@ export function OrganizationSwitcher({
                 />
 
                 <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
-                  {activeOrganization.name.slice(0, 2)}
+                  {activeOrganization.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
@@ -103,7 +103,7 @@ export function OrganizationSwitcher({
                   />
 
                   <AvatarFallback className="rounded-sm">
-                    {organization.name.slice(0, 2)}
+                    {organization.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 {organization.name}

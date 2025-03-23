@@ -175,3 +175,10 @@ This section is based on the Supabase documentation for [**Login With Google**](
 6. In your `.env` file, set the `APP_URL` to your local development URL (by default it's `http://localhost:5173`) or your production site URL.
 
 **Note:** [Here](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=environment&environment=server&queryGroups=framework&framework=remix#google-consent-screen) are more details on how to configure the Google consent screen to show your custom domain, and even your app's name and logo.
+
+---
+
+Folder structure:
+
+- https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+- https://www.gatsbyjs.com/docs/reference/local-development/fast-refresh/#how-it-works

@@ -1,10 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2Icon } from 'lucide-react';
-import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form, href, Link, useSubmit } from 'react-router';
-import { z } from 'zod';
 
 import { GooggleIcon } from '~/components/svgs/google-icon';
 import { Button, buttonVariants } from '~/components/ui/button';
@@ -26,26 +24,13 @@ import {
 import { Input } from '~/components/ui/input';
 import { cn } from '~/lib/utils';
 
-import { loginIntents } from '../user-authentication-constants';
-
-export const loginWithEmailSchema = z.object({
-  intent: z.literal(loginIntents.loginWithEmail),
-  email: z
-    .string({
-      invalid_type_error: 'user-authentication:common.email-must-be-string',
-    })
-    .min(1, 'user-authentication:common.email-required')
-    .email('user-authentication:common.email-invalid'),
-});
-
-type LoginWithEmailSchema = z.infer<typeof loginWithEmailSchema>;
-export type EmailLoginErrors = FieldErrors<LoginWithEmailSchema>;
-
-export const loginWithGoogleSchema = z.object({
-  intent: z.literal(loginIntents.loginWithGoogle),
-});
-
-type LoginWithGoogleSchema = z.infer<typeof loginWithGoogleSchema>;
+import { LOGIN_INTENTS } from './login-constants';
+import type {
+  EmailLoginErrors,
+  LoginWithEmailSchema,
+  LoginWithGoogleSchema,
+} from './login-schemas';
+import { loginWithEmailSchema, loginWithGoogleSchema } from './login-schemas';
 
 export type LoginFormCardProps = {
   errors?: EmailLoginErrors;
@@ -68,7 +53,7 @@ export function LoginFormCard({
   const emailForm = useForm<LoginWithEmailSchema>({
     resolver: zodResolver(loginWithEmailSchema),
     defaultValues: {
-      intent: loginIntents.loginWithEmail,
+      intent: LOGIN_INTENTS.loginWithEmail,
       email: '',
     },
     errors,
@@ -82,7 +67,7 @@ export function LoginFormCard({
 
   const googleForm = useForm<LoginWithGoogleSchema>({
     resolver: zodResolver(loginWithGoogleSchema),
-    defaultValues: { intent: loginIntents.loginWithGoogle },
+    defaultValues: { intent: LOGIN_INTENTS.loginWithGoogle },
   });
 
   const handleGoogleSubmit = async (values: LoginWithGoogleSchema) => {
@@ -131,7 +116,7 @@ export function LoginFormCard({
                 <Button
                   className="w-full"
                   name="intent"
-                  value={loginIntents.loginWithEmail}
+                  value={LOGIN_INTENTS.loginWithEmail}
                   type="submit"
                 >
                   {isLoggingInWithEmail ? (
@@ -164,7 +149,7 @@ export function LoginFormCard({
                   className="w-full"
                   name="intent"
                   type="submit"
-                  value={loginIntents.loginWithGoogle}
+                  value={LOGIN_INTENTS.loginWithGoogle}
                   variant="outline"
                 >
                   {isLoggingInWithGoogle ? (

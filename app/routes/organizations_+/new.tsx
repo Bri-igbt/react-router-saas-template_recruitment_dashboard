@@ -2,10 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation } from 'react-router';
 import { promiseHash } from 'remix-utils/promise';
 
-import {
-  CreateOrganizationFormCard,
-  createOrganizationIntent,
-} from '~/features/organizations/create-organization/create-organization-form-card';
+import { CREATE_ORGANIZATION_INTENT } from '~/features/organizations/create-organization/create-organization-constants';
+import { CreateOrganizationFormCard } from '~/features/organizations/create-organization/create-organization-form-card';
 import { createOrganizationAction } from '~/features/organizations/create-organization/creatie-organization-action.server';
 import { requireAuthenticatedUserExists } from '~/features/user-accounts/user-accounts-helpers.server';
 import { getFormErrors } from '~/utils/get-form-errors';
@@ -24,7 +22,7 @@ export async function loader(args: Route.LoaderArgs) {
   return { title: getPageTitle(t, 'new.page-title') };
 }
 
-export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
 
 export async function action(args: Route.ActionArgs) {
   return await createOrganizationAction(args);
@@ -39,7 +37,7 @@ export default function NewOrganizationRoute({
 
   const navigation = useNavigation();
   const isCreatingOrganization =
-    navigation.formData?.get('intent') === createOrganizationIntent;
+    navigation.formData?.get('intent') === CREATE_ORGANIZATION_INTENT;
 
   return (
     <>

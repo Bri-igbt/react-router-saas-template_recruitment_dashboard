@@ -3,10 +3,10 @@ import { href, useNavigation } from 'react-router';
 import { promiseHash } from 'remix-utils/promise';
 
 import { GeneralErrorBoundary } from '~/components/general-error-boundary';
-import { onboardingIntents } from '~/features/onboarding/onboarding-constants';
 import { requireUserNeedsOnboarding } from '~/features/onboarding/onboarding-helpers.server';
 import { OnboardingSteps } from '~/features/onboarding/onboarding-steps';
 import { onboardingUserAccountAction } from '~/features/onboarding/user-account/onboarding-user-account-action.server';
+import { ONBOARDING_USER_ACCOUNT_INTENT } from '~/features/onboarding/user-account/onboarding-user-account-constants';
 import { OnboardingUserAccountFormCard } from '~/features/onboarding/user-account/onboarding-user-account-form-card';
 import { getFormErrors } from '~/utils/get-form-errors';
 import { getPageTitle } from '~/utils/get-page-title.server';
@@ -25,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { title: getPageTitle(t, 'user-account.title') };
 }
 
-export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
 
 export async function action(args: Route.ActionArgs) {
   return await onboardingUserAccountAction(args);
@@ -37,7 +37,7 @@ export default function UserAccountOnboardingRoute({
   const { t } = useTranslation('onboarding');
   const navigation = useNavigation();
   const isCreatingUserAccount =
-    navigation.formData?.get('intent') === onboardingIntents.createUserAccount;
+    navigation.formData?.get('intent') === ONBOARDING_USER_ACCOUNT_INTENT;
   const errors = getFormErrors(actionData);
 
   return (

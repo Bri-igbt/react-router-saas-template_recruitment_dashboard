@@ -49,6 +49,18 @@ export async function saveOrganizationWithOwnerToDatabase({
 /* READ */
 
 /**
+ * Retrieves an organization by its id.
+ *
+ * @param id - The id of the organization to retrieve.
+ * @returns The organization or null if not found.
+ */
+export async function retrieveOrganizationFromDatabaseById(
+  id: Organization['id'],
+) {
+  return prisma.organization.findUnique({ where: { id } });
+}
+
+/**
  * Retrieves an organization by its slug with memberships.
  *
  * @param slug - The slug of the organization to retrieve.
@@ -64,6 +76,23 @@ export async function retrieveOrganizationWithMembershipsFromDatabaseBySlug(
 }
 
 /* UPDATE */
+
+/**
+ * Updates an organization by its slug.
+ *
+ * @param slug - The slug of the organization to update.
+ * @param organization - The new data for the organization.
+ * @returns The updated organization.
+ */
+export async function updateOrganizationInDatabaseBySlug({
+  slug,
+  organization,
+}: {
+  slug: Organization['slug'];
+  organization: Omit<Prisma.OrganizationUpdateInput, 'id'>;
+}) {
+  return prisma.organization.update({ where: { slug }, data: organization });
+}
 
 /**
  * Adds members to an organization.

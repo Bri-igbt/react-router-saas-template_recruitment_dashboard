@@ -42,7 +42,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   };
 }
 
-export const meta: Route.MetaFunction = ({ data }) => [{ title: data.title }];
+export const meta: Route.MetaFunction = ({ data }) => [{ title: data?.title }];
 
 export default function OrganizationsRoute({
   loaderData,

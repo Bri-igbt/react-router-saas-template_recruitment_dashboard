@@ -4,11 +4,9 @@ import { describe, expect, test } from 'vitest';
 import { createRoutesStub } from '~/test/react-test-utils';
 import type { Factory } from '~/utils/types';
 
-import type {
-  OnboardingOrganizationErrors,
-  OnboardingOrganizationFormCardProps,
-} from './onboarding-organization-form-card';
+import type { OnboardingOrganizationFormCardProps } from './onboarding-organization-form-card';
 import { OnboardingOrganizationFormCard } from './onboarding-organization-form-card';
+import type { OnboardingOrganizationErrors } from './onboarding-organization-schemas';
 
 const createProps: Factory<OnboardingOrganizationFormCardProps> = ({
   errors,
