@@ -31,6 +31,7 @@ type AppSidebarProps = {
   NavUserProps;
 
 export function AppSidebar({
+  currentOrganization,
   organizations,
   organizationSlug,
   user,
@@ -43,7 +44,10 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <OrganizationSwitcher organizations={organizations} />
+        <OrganizationSwitcher
+          currentOrganization={currentOrganization}
+          organizations={organizations}
+        />
       </SidebarHeader>
 
       <SidebarContent>

@@ -36,6 +36,14 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports', // Enforces `import type` for type-only imports
+          fixStyle: 'separate-type-imports', // Autofixes to use separate `import type` statements
+          disallowTypeAnnotations: true, // Disallows `import { type }` in type annotations
+        },
+      ],
       '@typescript-eslint/no-misused-promises': [
         'error',
         { checksVoidReturn: { attributes: false } },

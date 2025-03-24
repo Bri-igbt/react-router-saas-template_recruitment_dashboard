@@ -5,7 +5,7 @@ import { href, Link } from 'react-router';
 import { buttonVariants } from '~/components/ui/button';
 import { requireUserIsAnonymous } from '~/features/user-authentication/user-authentication-helpers.server';
 
-import janHestersAvatar from '../../public/avatar.png';
+import janHestersAvatar from '../../public/avatar.png?url';
 import type { Route } from './+types/_index';
 
 export const handle = { i18n: ['common', 'landing'] };

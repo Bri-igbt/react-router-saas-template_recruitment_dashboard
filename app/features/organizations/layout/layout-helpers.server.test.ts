@@ -1,8 +1,10 @@
+import { href } from 'react-router';
 import { describe, expect, test } from 'vitest';
 
 import { createUserWithOrganizations } from '~/features/onboarding/onboarding-helpers.server.test';
 
-import { getSidebarState } from './layout-helpers.server';
+import { createPopulatedOrganization } from '../organizations-factories.server';
+import { getSidebarState, switchSlugInRoute } from './layout-helpers.server';
 import { mapOnboardingUserToOrganizationLayoutProps } from './layout-helpers.server';
 
 describe('getSidebarState', () => {
@@ -55,7 +57,7 @@ describe('getSidebarState', () => {
   });
 });
 
-describe('mapOnboardingUserToOrganizationLayoutProps', () => {
+describe('mapOnboardingUserToOrganizationLayoutProps()', () => {
   test('given: onboarding user with organizations, should: map to organization layout props', () => {
     const user = createUserWithOrganizations({
       name: 'John Doe',
@@ -84,9 +86,20 @@ describe('mapOnboardingUserToOrganizationLayoutProps', () => {
         },
       ],
     });
+    const organizationSlug = 'org-2';
 
-    const actual = mapOnboardingUserToOrganizationLayoutProps(user);
+    const actual = mapOnboardingUserToOrganizationLayoutProps({
+      user,
+      organizationSlug,
+    });
     const expected = {
+      currentOrganization: {
+        id: 'org2',
+        name: 'Organization 2',
+        logo: 'https://example.com/org2.jpg',
+        slug: 'org-2',
+        plan: 'Free',
+      },
       organizations: [
         {
           id: 'org1',
@@ -121,8 +134,12 @@ describe('mapOnboardingUserToOrganizationLayoutProps', () => {
       memberships: [],
     });
 
-    const actual = mapOnboardingUserToOrganizationLayoutProps(user);
+    const actual = mapOnboardingUserToOrganizationLayoutProps({
+      user,
+      organizationSlug: 'org-1',
+    });
     const expected = {
+      currentOrganization: undefined,
       organizations: [],
       user: {
         name: 'John Doe',
@@ -133,4 +150,43 @@ describe('mapOnboardingUserToOrganizationLayoutProps', () => {
 
     expect(actual).toEqual(expected);
   });
+});
+
+describe('switchSlugInRoute()', () => {
+  test.each([
+    {
+      route: href('/organizations/:organizationSlug', {
+        organizationSlug: createPopulatedOrganization().slug,
+      }),
+      slug: 'org-1',
+      expected: href('/organizations/:organizationSlug', {
+        organizationSlug: 'org-1',
+      }),
+    },
+    {
+      route: href('/organizations/:organizationSlug/dashboard', {
+        organizationSlug: createPopulatedOrganization().slug,
+      }),
+      slug: 'org-1',
+      expected: href('/organizations/:organizationSlug/dashboard', {
+        organizationSlug: 'org-1',
+      }),
+    },
+    {
+      route: href('/organizations/:organizationSlug/settings/general', {
+        organizationSlug: createPopulatedOrganization().slug,
+      }),
+      slug: 'org-1',
+      expected: href('/organizations/:organizationSlug/settings/general', {
+        organizationSlug: 'org-1',
+      }),
+    },
+  ])(
+    'given: a route with a slug, should: return the route with the slug replaced',
+    ({ route, slug, expected }) => {
+      const actual = switchSlugInRoute(route, slug);
+
+      expect(actual).toEqual(expected);
+    },
+  );
 });

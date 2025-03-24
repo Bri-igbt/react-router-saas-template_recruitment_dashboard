@@ -1,8 +1,7 @@
 import type { Organization } from '@prisma/client';
 import { ChevronsUpDownIcon, PlusIcon } from 'lucide-react';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Form, Link, useLocation } from 'react-router';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import {
@@ -20,28 +19,33 @@ import {
   useSidebar,
 } from '~/components/ui/sidebar';
 
+import { SWITCH_ORGANIZATION_INTENT } from './sidebar-layout-constants';
+
+type OrganizationSwitcherOrganization = {
+  id: Organization['id'];
+  name: Organization['name'];
+  logo: Organization['imageUrl'];
+  slug: Organization['slug'];
+  plan: string;
+};
+
 export type OrganizationSwitcherProps = {
-  organizations: {
-    id: Organization['id'];
-    name: Organization['name'];
-    logo: Organization['imageUrl'];
-    slug: Organization['slug'];
-    plan: string;
-  }[];
+  organizations: OrganizationSwitcherOrganization[];
+  currentOrganization?: OrganizationSwitcherOrganization;
 };
 
 export function OrganizationSwitcher({
   organizations,
+  currentOrganization,
 }: OrganizationSwitcherProps) {
   const { isMobile } = useSidebar();
-  const [activeOrganization, setActiveOrganization] = useState(
-    organizations[0],
-  );
   const { t } = useTranslation('organizations', {
     keyPrefix: 'layout.organization-switcher',
   });
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-  if (!activeOrganization) {
+  if (!currentOrganization) {
     // eslint-disable-next-line unicorn/no-null
     return null;
   }
@@ -57,22 +61,22 @@ export function OrganizationSwitcher({
             >
               <Avatar className="aspect-square size-8 rounded-lg">
                 <AvatarImage
-                  alt={activeOrganization.name}
-                  src={activeOrganization.logo}
+                  alt={currentOrganization.name}
+                  src={currentOrganization.logo}
                 />
 
                 <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
-                  {activeOrganization.name.slice(0, 2).toUpperCase()}
+                  {currentOrganization.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeOrganization.name}
+                  {currentOrganization.name}
                 </span>
 
                 <span className="truncate text-xs">
-                  {activeOrganization.plan}
+                  {currentOrganization.plan}
                 </span>
               </div>
 
@@ -91,23 +95,38 @@ export function OrganizationSwitcher({
             </DropdownMenuLabel>
 
             {organizations.map(organization => (
-              <DropdownMenuItem
-                key={organization.id}
-                onClick={() => setActiveOrganization(organization)}
-                className="gap-2 p-2"
-              >
-                <Avatar className="aspect-square size-6 rounded-sm border">
-                  <AvatarImage
-                    src={organization.logo}
-                    alt={organization.name}
-                  />
+              <Form method="POST" replace key={organization.id}>
+                <DropdownMenuItem asChild className="w-full gap-2 p-2">
+                  <button
+                    type="submit"
+                    name="intent"
+                    value={SWITCH_ORGANIZATION_INTENT}
+                  >
+                    <input
+                      type="hidden"
+                      name="organizationId"
+                      value={organization.id}
+                    />
+                    <input
+                      type="hidden"
+                      name="currentPath"
+                      value={currentPath}
+                    />
 
-                  <AvatarFallback className="rounded-sm">
-                    {organization.name.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {organization.name}
-              </DropdownMenuItem>
+                    <Avatar className="aspect-square size-6 rounded-sm border">
+                      <AvatarImage
+                        src={organization.logo}
+                        alt={organization.name}
+                      />
+
+                      <AvatarFallback className="rounded-sm">
+                        {organization.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {organization.name}
+                  </button>
+                </DropdownMenuItem>
+              </Form>
             ))}
             <DropdownMenuSeparator />
 
@@ -118,7 +137,7 @@ export function OrganizationSwitcher({
                 </div>
 
                 <div className="text-muted-foreground font-medium">
-                  {t('add-organization')}
+                  {t('new-organization')}
                 </div>
               </DropdownMenuItem>
             </Link>

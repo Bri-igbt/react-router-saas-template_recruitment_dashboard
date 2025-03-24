@@ -9,7 +9,33 @@ import {
 } from '../onboarding/onboarding-helpers.server';
 
 /**
- * Finds an organization if the given user is a member of it.
+ * Finds an organization by ID if the given user is a member of it.
+ *
+ * @param user - The user to check membership for.
+ * @param organizationId - The ID of the organization to find.
+ * @returns The organization if found and user is a member.
+ * @throws {Response} 404 Not Found if user is not a member or organization
+ * doesn't exist.
+ */
+export function findOrganizationIfUserIsMemberById<User extends OnboardingUser>(
+  user: User,
+  organizationId: Organization['id'],
+) {
+  const membership = user.memberships.find(
+    membership => membership.organization.id === organizationId,
+  );
+
+  if (!membership) {
+    throw notFound();
+  }
+
+  const organization = throwIfEntityIsMissing(membership.organization);
+
+  return { organization, role: membership.role };
+}
+
+/**
+ * Finds an organization by slug if the given user is a member of it.
  *
  * @param user - The user to check membership for.
  * @param organizationSlug - The slug of the organization to find.
@@ -17,10 +43,9 @@ import {
  * @throws {Response} 404 Not Found if user is not a member or organization
  * doesn't exist.
  */
-export function findOrganizationIfUserIsMember<User extends OnboardingUser>(
-  user: User,
-  organizationSlug: Organization['slug'],
-) {
+export function findOrganizationIfUserIsMemberBySlug<
+  User extends OnboardingUser,
+>(user: User, organizationSlug: Organization['slug']) {
   const membership = user.memberships.find(
     membership => membership.organization.slug === organizationSlug,
   );
@@ -50,7 +75,7 @@ export async function requireUserIsMemberOfOrganization(
   organizationSlug: Organization['slug'],
 ) {
   const { user, headers } = await requireOnboardedUserAccountExists(request);
-  const { organization, role } = findOrganizationIfUserIsMember(
+  const { organization, role } = findOrganizationIfUserIsMemberBySlug(
     user,
     organizationSlug,
   );

@@ -4,7 +4,7 @@ import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { Form, href, Link, useSubmit } from 'react-router';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import {

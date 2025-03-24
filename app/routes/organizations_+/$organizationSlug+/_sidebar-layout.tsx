@@ -9,6 +9,7 @@ import {
   getSidebarState,
   mapOnboardingUserToOrganizationLayoutProps,
 } from '~/features/organizations/layout/layout-helpers.server';
+import { sidebarLayoutAction } from '~/features/organizations/layout/sidebar-layout-action.server';
 import { requireUserIsMemberOfOrganization } from '~/features/organizations/organizations-helpers.server';
 
 import type { Route } from './+types/_sidebar-layout';
@@ -51,8 +52,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     headers,
     headerTitle: 'React Router SaaS Template',
     defaultSidebarOpen,
-    ...mapOnboardingUserToOrganizationLayoutProps(user),
+    ...mapOnboardingUserToOrganizationLayoutProps({
+      user,
+      organizationSlug: params.organizationSlug,
+    }),
   };
+}
+
+export async function action(args: Route.ActionArgs) {
+  return sidebarLayoutAction(args);
 }
 
 export default function OrganizationLayoutRoute({
@@ -60,7 +68,8 @@ export default function OrganizationLayoutRoute({
   params,
   matches,
 }: Route.ComponentProps) {
-  const { defaultSidebarOpen, organizations, user } = loaderData;
+  const { currentOrganization, defaultSidebarOpen, organizations, user } =
+    loaderData;
   const headerTitle = findHeaderTitle(
     matches as UIMatch<{ headerTitle?: string }>[],
   );
@@ -68,6 +77,7 @@ export default function OrganizationLayoutRoute({
   return (
     <SidebarProvider defaultOpen={defaultSidebarOpen}>
       <AppSidebar
+        currentOrganization={currentOrganization}
         organizations={organizations}
         organizationSlug={params.organizationSlug}
         user={user}

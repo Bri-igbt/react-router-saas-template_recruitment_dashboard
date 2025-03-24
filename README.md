@@ -182,3 +182,7 @@ Folder structure:
 
 - https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
 - https://www.gatsbyjs.com/docs/reference/local-development/fast-refresh/#how-it-works
+
+---
+
+Give it your own name! Fuzzy search for `React Router SaaS Template` to find all the places you need to change the name.

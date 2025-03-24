@@ -1,5 +1,6 @@
-import { type RequestHandler } from 'msw';
-import { type SetupServer, setupServer } from 'msw/node';
+import type { RequestHandler } from 'msw';
+import type { SetupServer } from 'msw/node';
+import { setupServer } from 'msw/node';
 
 import { onUnhandledRequest } from './msw-utils';
 import { remixPingHandler } from './msw-utils.server';

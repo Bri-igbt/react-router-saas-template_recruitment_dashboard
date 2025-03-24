@@ -26,12 +26,13 @@ const createProps: Factory<OrganizationSwitcherProps> = ({
     createOrganization({ name: 'Home Org' }),
     createOrganization({ name: 'Work Org' }),
   ],
-} = {}) => ({ organizations });
+  currentOrganization = createOrganization({ name: 'Work Org' }),
+} = {}) => ({ organizations, currentOrganization });
 
 describe('OrganizationSwitcher Component', () => {
-  test('given: organizations data, should: render active organization in the button', () => {
-    const props = createProps();
-    const { organizations } = props;
+  test('given: organizations data, should: render current organization in the button', () => {
+    const currentOrganization = createOrganization();
+    const props = createProps({ currentOrganization });
     const path = '/test';
     const RouterStub = createRoutesStub([
       { path, Component: () => <OrganizationSwitcher {...props} /> },
@@ -43,9 +44,9 @@ describe('OrganizationSwitcher Component', () => {
       </SidebarProvider>,
     );
 
-    // Verify active organization is displayed.
-    expect(screen.getByText(organizations[0].name)).toBeInTheDocument();
-    expect(screen.getByText(organizations[0].plan)).toBeInTheDocument();
+    // Verify current organization is displayed.
+    expect(screen.getByText(currentOrganization.name)).toBeInTheDocument();
+    expect(screen.getByText(currentOrganization.plan)).toBeInTheDocument();
   });
 
   test('given: organizations data, should: handle dropdown menu interactions', async () => {
@@ -64,7 +65,7 @@ describe('OrganizationSwitcher Component', () => {
     );
 
     // Verify dropdown menu is initially closed.
-    expect(screen.queryByText(organizations[1].name)).not.toBeInTheDocument();
+    expect(screen.queryByText(organizations[0].name)).not.toBeInTheDocument();
 
     // Click the organization button to open the menu.
     const orgButton = screen.getByRole('button');
@@ -77,43 +78,15 @@ describe('OrganizationSwitcher Component', () => {
       ).toBeInTheDocument();
     }
 
-    // Verify add organization button is displayed.
+    // Verify new organization button is displayed.
     expect(
-      screen.getByRole('link', { name: /add organization/i }),
+      screen.getByRole('link', { name: /new organization/i }),
     ).toHaveAttribute('href', '/organizations/new');
 
     // Press escape to close the dropdown.
     await user.keyboard('{Escape}');
 
     // Verify menu is closed.
-    expect(screen.queryByText(organizations[1].name)).not.toBeInTheDocument();
-  });
-
-  test('given: multiple organizations, should: switch active organization when clicked', async () => {
-    const user = userEvent.setup();
-    const props = createProps();
-    const { organizations } = props;
-    const path = '/test';
-    const RouterStub = createRoutesStub([
-      { path, Component: () => <OrganizationSwitcher {...props} /> },
-    ]);
-
-    render(
-      <SidebarProvider>
-        <RouterStub initialEntries={[path]} />
-      </SidebarProvider>,
-    );
-
-    // Open the menu.
-    const orgButton = screen.getByRole('button');
-    await user.click(orgButton);
-
-    // Click the second organization.
-    const secondOrg = screen.getByText(organizations[1].name);
-    await user.click(secondOrg);
-
-    // Verify the second organization is now active.
-    expect(screen.getByText(organizations[1].name)).toBeInTheDocument();
-    expect(screen.getByText(organizations[1].plan)).toBeInTheDocument();
+    expect(screen.queryByText(organizations[0].name)).not.toBeInTheDocument();
   });
 });

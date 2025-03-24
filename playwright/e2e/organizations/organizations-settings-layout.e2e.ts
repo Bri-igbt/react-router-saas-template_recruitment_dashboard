@@ -2,6 +2,11 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 import { createPopulatedOrganization } from '~/features/organizations/organizations-factories.server';
+import {
+  addMembersToOrganizationInDatabaseById,
+  deleteOrganizationFromDatabaseById,
+  saveOrganizationToDatabase,
+} from '~/features/organizations/organizations-model.server';
 import { createPopulatedUserAccount } from '~/features/user-accounts/user-accounts-factories.server';
 import { deleteUserAccountFromDatabaseById } from '~/features/user-accounts/user-accounts-model.server';
 import { teardownOrganizationAndMember } from '~/test/test-utils';
@@ -81,6 +86,41 @@ test.describe('organization settings layout', () => {
     await expect(generalLink).toHaveAttribute('data-active', 'true');
 
     await teardownOrganizationAndMember({ organization, user });
+  });
+
+  test.describe('organization switcher', () => {
+    test('given: a logged in user who is a member of multiple organizations, should: be able to switch the organization but stay on the same page for the picked organization', async ({
+      page,
+    }) => {
+      const { organization, user } = await setupOrganizationAndLoginAsMember({
+        page,
+      });
+      const otherOrganization = createPopulatedOrganization();
+      await saveOrganizationToDatabase(otherOrganization);
+      await addMembersToOrganizationInDatabaseById({
+        id: otherOrganization.id,
+        members: [user.id],
+        role: 'member',
+      });
+
+      await page.goto(`/organizations/${organization.slug}/settings/general`);
+
+      await page
+        .getByRole('button', { name: new RegExp(organization.name, 'i') })
+        .click();
+      await page
+        .getByRole('menuitem', {
+          name: new RegExp(otherOrganization.name, 'i'),
+        })
+        .click();
+
+      await expect(page).toHaveURL(
+        `/organizations/${otherOrganization.slug}/settings/general`,
+      );
+
+      await deleteOrganizationFromDatabaseById(otherOrganization.id);
+      await teardownOrganizationAndMember({ organization, user });
+    });
   });
 
   test('given: a logged in user who is onboarded and a member of the organization, should: lack any automatically detectable accessibility issues', async ({

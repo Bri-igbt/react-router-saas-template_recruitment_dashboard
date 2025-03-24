@@ -3,7 +3,7 @@ import { Loader2Icon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Form, useSubmit } from 'react-router';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import {
