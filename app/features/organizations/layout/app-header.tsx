@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 import { SidebarTrigger } from '~/components/ui/sidebar';
+import { ThemeToggle } from '~/features/color-scheme/theme-toggle';
 
 export type AppHeaderProps = {
   title?: string;
@@ -35,6 +36,8 @@ export function AppHeader({ title }: AppHeaderProps) {
           >
             <BellIcon />
           </Button>
+
+          <ThemeToggle />
         </div>
       </div>
     </header>

@@ -81,6 +81,7 @@ export default function OrganizationLayoutRoute({
         organizations={organizations}
         organizationSlug={params.organizationSlug}
         user={user}
+        variant="inset"
       />
 
       <SidebarInset>

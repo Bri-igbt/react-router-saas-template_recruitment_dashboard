@@ -71,6 +71,7 @@ export function GeneralOrganizationSettings({
       <Form
         id="update-organization-form"
         method="POST"
+        replace
         onSubmit={form.handleSubmit(handleSubmit)}
       >
         <fieldset

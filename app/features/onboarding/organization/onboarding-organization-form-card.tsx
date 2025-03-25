@@ -72,6 +72,7 @@ export function OnboardingOrganizationFormCard({
           <Form
             id="organization-form"
             method="POST"
+            replace
             onSubmit={form.handleSubmit(handleSubmit)}
           >
             <fieldset disabled={isCreatingOrganization}>

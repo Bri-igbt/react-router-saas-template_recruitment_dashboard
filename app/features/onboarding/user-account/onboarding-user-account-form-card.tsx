@@ -72,6 +72,7 @@ export function OnboardingUserAccountFormCard({
           <Form
             id="user-account-form"
             method="POST"
+            replace
             onSubmit={form.handleSubmit(handleSubmit)}
           >
             <fieldset disabled={isCreatingUserAccount}>

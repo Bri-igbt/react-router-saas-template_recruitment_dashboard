@@ -96,6 +96,7 @@ export function RegistrationFormCard({
             <FormProvider {...emailForm}>
               <Form
                 method="POST"
+                replace
                 onSubmit={emailForm.handleSubmit(handleEmailSubmit)}
               >
                 <fieldset className="grid gap-6" disabled={isSubmitting}>

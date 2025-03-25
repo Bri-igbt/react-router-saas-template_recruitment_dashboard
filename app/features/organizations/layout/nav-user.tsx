@@ -93,7 +93,7 @@ export function NavUser({ user }: NavUserProps) {
 
             <DropdownMenuSeparator />
 
-            <Form method="post" action="/logout">
+            <Form method="post" action="/logout" replace>
               <button
                 className="w-full"
                 name="intent"

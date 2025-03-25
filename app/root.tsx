@@ -22,6 +22,9 @@ import i18next from '~/utils/i18next.server';
 import type { Route } from './+types/root';
 import { NotFound } from './components/not-found';
 import { Toaster } from './components/ui/sonner';
+import { parseColorScheme } from './features/color-scheme/color-scheme.server';
+import { ColorSchemeScript } from './features/color-scheme/color-scheme-script';
+import { useColorScheme } from './features/color-scheme/use-color-scheme';
 import { useToast } from './hooks/use-toast';
 import { getToast } from './utils/toast.server';
 
@@ -39,7 +42,7 @@ export const links: Route.LinksFunction = () => [
   { rel: 'stylesheet', href: sonnerStyles },
 ];
 
-export const handle = { i18n: 'common' };
+export const handle = { i18n: ['common', 'color-scheme'] };
 
 /**
  * By enabling single fetch, the loaders will no longer revalidate the data when the action status is in the 4xx range.
@@ -58,7 +61,8 @@ export const shouldRevalidate = ({
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { locale, t, toastData } = await promiseHash({
+  const { colorScheme, locale, t, toastData } = await promiseHash({
+    colorScheme: parseColorScheme(request),
     locale: i18next.getLocale(request),
     t: i18next.getFixedT(request),
     toastData: getToast(request),
@@ -67,7 +71,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   const title = t('app-name');
   const { toast, headers: toastHeaders } = toastData;
   return data(
-    { ENV: { CLIENT_MOCKS: CLIENT_MOCKS === 'true' }, locale, title, toast },
+    {
+      colorScheme,
+      ENV: { CLIENT_MOCKS: CLIENT_MOCKS === 'true' },
+      locale,
+      title,
+      toast,
+    },
     { headers: toastHeaders },
   );
 }
@@ -81,6 +91,7 @@ export function Layout({
   const locale = data?.locale ?? 'en';
   const error = useRouteError();
   const isErrorFromRoute = isRouteErrorResponse(error);
+  const colorScheme = useColorScheme();
 
   const { i18n } = useTranslation();
 
@@ -88,8 +99,19 @@ export function Layout({
   useToast(data?.toast);
 
   return (
-    <html className="dark" lang={locale} dir={i18n.dir()}>
+    <html
+      className={colorScheme === 'dark' ? 'dark' : ''}
+      lang={locale}
+      dir={i18n.dir()}
+      // When the user a.) has their system color scheme set to "dark", and b.)
+      // picks "system" in the theme toggle, the color scheme is undefined from
+      // the root loader, but "dark" in the client. There won't be a flash
+      // because the `ColorSchemeScript` will set the correct class name using
+      // `useLayoutEffect`.
+      suppressHydrationWarning
+    >
       <head>
+        <ColorSchemeScript />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
