@@ -91,6 +91,7 @@ export default function GeneralOrganizationSettingsRoute({
             <DangerZone
               isDeletingOrganization={isDeletingOrganization}
               isSubmitting={isSubmitting}
+              organizationName={organization.name}
             />
           </>
         ) : (

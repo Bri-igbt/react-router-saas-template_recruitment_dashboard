@@ -8,16 +8,15 @@ import {
 } from '~/test/react-test-utils';
 import type { Factory } from '~/utils/types';
 
+import { createPopulatedOrganization } from '../../organizations-factories.server';
 import type { DangerZoneProps } from './danger-zone';
 import { DangerZone } from './danger-zone';
 
 const createProps: Factory<DangerZoneProps> = ({
   isDeletingOrganization = false,
   isSubmitting = false,
-} = {}) => ({
-  isDeletingOrganization,
-  isSubmitting,
-});
+  organizationName = createPopulatedOrganization().name,
+} = {}) => ({ isDeletingOrganization, isSubmitting, organizationName });
 
 describe('DangerZone Component', () => {
   test('given: component renders with default props, should: render danger zone section with delete button', () => {
@@ -138,11 +137,12 @@ describe('DangerZone Component', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  test('given: dialog is open, should: submit form with delete intent when confirm is clicked', async () => {
+  test('given: dialog is open, should: submit form with delete intent when confirm is clicked and the submit button should be disabled until the user types in the organization name', async () => {
     const user = userEvent.setup();
     const path = '/organizations/test/settings/general';
+    const props = createProps();
     const RouterStub = createRoutesStub([
-      { path, Component: () => <DangerZone {...createProps()} /> },
+      { path, Component: () => <DangerZone {...props} /> },
     ]);
 
     render(<RouterStub initialEntries={[path]} />);
@@ -159,5 +159,71 @@ describe('DangerZone Component', () => {
     expect(deleteConfirmButton).toHaveAttribute('name', 'intent');
     expect(deleteConfirmButton).toHaveAttribute('value', 'delete-organization');
     expect(deleteConfirmButton).toHaveAttribute('type', 'submit');
+    expect(deleteConfirmButton).toBeDisabled();
+
+    // Type in the organization name
+    await user.type(
+      screen.getByLabelText(
+        new RegExp(
+          `to confirm, type "${props.organizationName}" in the box below`,
+          'i',
+        ),
+      ),
+      props.organizationName,
+    );
+
+    // Verify the delete button is enabled
+    expect(deleteConfirmButton).toBeEnabled();
+  });
+
+  test('given: dialog is opened, text entered, closed, and reopened, should: clear the confirmation input', async () => {
+    const user = userEvent.setup();
+    const path = '/organizations/test/settings/general';
+    const props = createProps();
+    const RouterStub = createRoutesStub([
+      { path, Component: () => <DangerZone {...props} /> },
+    ]);
+
+    render(<RouterStub initialEntries={[path]} />);
+
+    const getDialogInput = () =>
+      screen.getByRole('textbox', {
+        name: new RegExp(
+          `to confirm, type "${props.organizationName}" in the box below`,
+          'i',
+        ),
+      });
+
+    // --- First Open ---
+    // Open dialog
+    await user.click(
+      screen.getByRole('button', { name: /delete organization/i }),
+    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    // Type some text (not the full name)
+    const inputText = 'some text';
+    await user.type(getDialogInput(), inputText);
+
+    // Verify input has text
+    expect(getDialogInput()).toHaveValue(inputText);
+
+    // --- Close Dialog ---
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // --- Second Open ---
+    await user.click(
+      screen.getByRole('button', { name: /delete organization/i }),
+    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    // Verify input is now empty
+    expect(getDialogInput()).toHaveValue('');
+
+    // Verify delete button is disabled again
+    expect(
+      screen.getByRole('button', { name: /delete this organization$/i }),
+    ).toBeDisabled();
   });
 });

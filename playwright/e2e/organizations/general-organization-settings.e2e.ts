@@ -226,7 +226,7 @@ test.describe('general organization settings', () => {
       await teardownOrganizationAndMember({ organization, user });
     });
 
-    test('given: delete organization button is clicked, should: show confirmation dialog and allow organization deletion', async ({
+    test("given: delete organization button is clicked, should: show confirmation dialog and allow organization deletion if the user types in the organization's name as confirmation", async ({
       page,
     }) => {
       const { organization, user } = await setupOrganizationAndLoginAsMember({
@@ -254,6 +254,31 @@ test.describe('general organization settings', () => {
 
       // Confirm deletion
       await page.getByRole('button', { name: /delete organization/i }).click();
+      await expect(
+        page.getByRole('button', { name: /delete this organization/i }),
+      ).toBeDisabled();
+      const confirmationInput = page.getByRole('textbox', {
+        name: new RegExp(
+          `to confirm, type "${organization.name}" in the box below`,
+          'i',
+        ),
+      });
+      // Typing in anything less than the organization's name should keep the
+      // delete button disabled
+      await confirmationInput.fill(organization.name.slice(0, -1));
+      await expect(
+        page.getByRole('button', { name: /delete this organization/i }),
+      ).toBeDisabled();
+      // Typing in the name but messing up its capitalization should keep the
+      // delete button disabled
+      await confirmationInput.clear();
+      await confirmationInput.fill(organization.name.toLowerCase());
+      await expect(
+        page.getByRole('button', { name: /delete this organization/i }),
+      ).toBeDisabled();
+      // Typing in the organization's name should enable the delete button
+      await confirmationInput.clear();
+      await confirmationInput.fill(organization.name);
       await page
         .getByRole('button', { name: /delete this organization/i })
         .click();

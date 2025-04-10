@@ -91,6 +91,8 @@
         "delete-this-organization": "Delete this organization",
         "delete-title": "Delete this organization",
         "deleting": "Deleting organization...",
+        "dialog-confirmation-label": "To confirm, type \"{{organizationName}}\" in the box below",
+        "dialog-confirmation-placeholder": "Enter organization name...",
         "dialog-description": "Are you sure you want to delete this organization? This action cannot be undone.",
         "dialog-title": "Delete Organization",
         "title": "Danger Zone"
