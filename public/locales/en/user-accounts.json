@@ -1,0 +1,26 @@
+{
+  "settings": {
+    "account": {
+      "description": "Manage your account settings.",
+      "form": {
+        "avatar-description": "Your avatar will be shown across the application.",
+        "avatar-label": "Avatar",
+        "email-description": "Your email address is used to identify you and cannot be changed.",
+        "email-label": "Email",
+        "email-placeholder": "Your email address ...",
+        "name-description": "Your name will be shown in all organizations across the application.",
+        "name-label": "Name",
+        "name-max-length": "Your name must be at most 128 characters long.",
+        "name-min-length": "Your name must be at least 2 characters long.",
+        "name-must-be-string": "Your name must be a string.",
+        "name-placeholder": "Your name ...",
+        "save": "Save changes",
+        "saving": "Saving changes ..."
+      },
+      "page-title": "Account",
+      "toast": {
+        "user-account-updated": "Your account has been updated"
+      }
+    }
+  }
+}

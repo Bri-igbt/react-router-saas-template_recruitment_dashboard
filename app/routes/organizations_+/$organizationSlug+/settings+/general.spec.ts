@@ -18,6 +18,7 @@ import {
 } from '~/test/test-utils';
 import { badRequest, forbidden, notFound } from '~/utils/http-responses.server';
 import { toFormData } from '~/utils/to-form-data';
+import { getToast } from '~/utils/toast.server';
 
 import { action } from './general';
 
@@ -118,7 +119,7 @@ describe('/organizations/:organizationSlug/settings/general route action', () =>
       },
     );
 
-    test('given: a user who is an owner and a valid name, should: update organization name and redirect to new URL', async () => {
+    test('given: a user who is an owner and a valid name, should: update organization name, show a toast and redirect to new URL', async () => {
       const { user, organization } = await setupUserWithOrgAndAddAsMember({
         role: OrganizationMembershipRole.owner,
       });
@@ -142,6 +143,18 @@ describe('/organizations/:organizationSlug/settings/general route action', () =>
       );
       expect(updatedOrganization?.name).toEqual(name);
       expect(updatedOrganization?.slug).toEqual(slug);
+
+      const maybeToast = response.headers.get('Set-Cookie');
+      const { toast } = await getToast(
+        new Request(createUrl(organization.slug), {
+          headers: { cookie: maybeToast ?? '' },
+        }),
+      );
+      expect(toast).toMatchObject({
+        id: expect.any(String) as string,
+        title: 'Organization has been updated',
+        type: 'success',
+      });
     });
 
     test.each([
