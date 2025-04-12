@@ -235,6 +235,66 @@ test.describe(`${path} API route`, () => {
     await teardownOrganizationAndMember({ user: invitingUser, organization });
   });
 
+  test("given: a code for an existing user with an active invite link cookie for an organization that the user is already a member of, should: redirect them to the organization's dashboard and show a toast", async ({
+    page,
+  }) => {
+    // Create organization and user who is already a member
+    const { organization, user } = await createUserWithOrgAndAddAsMember();
+
+    // Create an invite link for the same organization
+    const link = createPopulatedOrganizationInviteLink({
+      organizationId: organization.id,
+      creatorId: user.id,
+    });
+    await saveOrganizationInviteLinkToDatabase(link);
+
+    // Set up the code verifier cookie
+    await setupCodeVerifierCookie({ page });
+
+    // Create auth code for the same user
+    const code = stringifyAuthCodeData({
+      provider: 'google',
+      email: user.email,
+      id: user.supabaseUserId,
+    });
+
+    // Set the invite link cookie
+    await setupInviteLinkCookie({
+      page,
+      link: { tokenId: link.id, expiresAt: link.expiresAt },
+    });
+
+    // Navigate to callback with code
+    await page.goto(`${path}?code=${code}`);
+
+    // Verify redirect to organization dashboard
+    await expect(
+      page.getByRole('heading', { name: /dashboard/i, level: 1 }),
+    ).toBeVisible();
+    expect(getPath(page)).toEqual(
+      `/organizations/${organization.slug}/dashboard`,
+    );
+
+    // Verify toast message
+    await expect(
+      page
+        .getByRole('region', { name: /notifications/i })
+        .getByText(
+          new RegExp(`You are already a member of ${organization.name}`, 'i'),
+        ),
+    ).toBeVisible();
+
+    // Verify invite link cookie is cleared
+    const cookies = await page.context().cookies();
+    const inviteLinkCookie = cookies.find(
+      cookie => cookie.name === INVITE_LINK_INFO_SESSION_NAME,
+    );
+    expect(inviteLinkCookie).toBeUndefined();
+
+    // Cleanup
+    await teardownOrganizationAndMember({ user, organization });
+  });
+
   test('given: no code parameter, should: return an error', async ({
     request,
   }) => {

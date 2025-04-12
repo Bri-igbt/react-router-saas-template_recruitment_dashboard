@@ -243,4 +243,58 @@ test.describe(`${path} API route`, () => {
     }
     await teardownOrganizationAndMember({ user: invitingUser, organization });
   });
+
+  test("given: a valid token hash for an existing user with an active invite link cookie for an organization they're already a member of, should: redirect to the organization's dashboard and show a toast", async ({
+    page,
+  }) => {
+    // Create organization and user who is already a member
+    const { organization, user } = await createUserWithOrgAndAddAsMember();
+
+    // Create an invite link for the same organization
+    const link = createPopulatedOrganizationInviteLink({
+      organizationId: organization.id,
+      creatorId: user.id,
+    });
+    await saveOrganizationInviteLinkToDatabase(link);
+
+    // Set the invite link cookie
+    await setupInviteLinkCookie({
+      page,
+      link: { tokenId: link.id, expiresAt: link.expiresAt },
+    });
+
+    // Go to login confirm with token hash for the same user
+    const tokenHash = stringifyTokenHashData({
+      email: user.email,
+      id: user.supabaseUserId,
+    });
+    await page.goto(`${path}?token_hash=${tokenHash}`);
+
+    // Verify redirect to organization dashboard
+    await expect(
+      page.getByRole('heading', { name: /dashboard/i, level: 1 }),
+    ).toBeVisible();
+    expect(getPath(page)).toEqual(
+      `/organizations/${organization.slug}/dashboard`,
+    );
+
+    // Verify toast message
+    await expect(
+      page
+        .getByRole('region', { name: /notifications/i })
+        .getByText(
+          new RegExp(`You are already a member of ${organization.name}`, 'i'),
+        ),
+    ).toBeVisible();
+
+    // Verify invite link cookie is cleared
+    const cookies = await page.context().cookies();
+    const inviteLinkCookie = cookies.find(
+      cookie => cookie.name === INVITE_LINK_INFO_SESSION_NAME,
+    );
+    expect(inviteLinkCookie).toBeUndefined();
+
+    // Cleanup
+    await teardownOrganizationAndMember({ user, organization });
+  });
 });

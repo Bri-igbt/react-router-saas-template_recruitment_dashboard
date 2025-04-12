@@ -44,6 +44,27 @@ export async function retrieveUserAccountFromDatabaseByEmail(
 }
 
 /**
+ * Retrieve a user account with their active organization memberships by email.
+ *
+ * @param email The email of the user account.
+ * @returns The user account with active memberships or null.
+ */
+export async function retrieveUserAccountWithActiveMembershipsFromDatabaseByEmail(
+  email: UserAccount['email'],
+) {
+  return prisma.userAccount.findUnique({
+    where: { email },
+    include: {
+      memberships: {
+        where: {
+          OR: [{ deactivatedAt: null }, { deactivatedAt: { gt: new Date() } }],
+        },
+      },
+    },
+  });
+}
+
+/**
  * Retrieves a user account by their Supabase ID.
  *
  * @param supabaseUserId The Supabase ID of the user account.

@@ -113,7 +113,9 @@ test.describe('login page', () => {
       await page.goto(path);
 
       // Fill in the email and click the login button.
+      await expect(page.getByText(/welcome back/i)).toBeVisible();
       const loginButton = page.getByRole('button', { name: /login/i });
+      await expect(loginButton).toBeVisible();
       const emailInput = page.getByLabel(/email/i);
       await emailInput.fill(userAccount.email);
       await loginButton.click();

@@ -1,20 +1,11 @@
-// TODO: add e2e tests if a user tries to join an organization that they're
-// already a member of.
-// If its from the accept invite link page, they should be redirected to the
-// dashboard of that organization with a toast saying they're already a member
-// of that organization.
-// If its from the login page, they should be redirected to the org's
-// dashboard, too, with a toast saying they're already a member of that
-// organization.
-
 // TODO: add header to user account page that redirects to the last organization
 // page they were on. (Use team switcher cookies for this.)
 // TODO: add header to organization creation page that redirects to the last
 // organization page they were on. (Use team switcher cookies for this.)
 
 // TODO: File uploads for logos & avatars
-// TODO: Notifications
 // TODO: invite via email
+// TODO: Notifications
 // TODO: billing
 
 // Billing:

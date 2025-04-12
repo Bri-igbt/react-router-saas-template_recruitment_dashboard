@@ -6,7 +6,7 @@ import { destroyInviteLinkInfoSession } from '~/features/organizations/accept-in
 import { saveInviteLinkUseToDatabase } from '~/features/organizations/accept-invite-link/invite-link-use-model.server';
 import { addMembersToOrganizationInDatabaseById } from '~/features/organizations/organizations-model.server';
 import {
-  retrieveUserAccountFromDatabaseByEmail,
+  retrieveUserAccountWithActiveMembershipsFromDatabaseByEmail,
   saveUserAccountToDatabase,
 } from '~/features/user-accounts/user-accounts-model.server';
 import { requireUserIsAnonymous } from '~/features/user-authentication/user-authentication-helpers.server';
@@ -48,10 +48,44 @@ export async function loader({ request }: Route.LoaderArgs) {
       throw new Error('User email not found');
     }
 
-    const maybeUser = await retrieveUserAccountFromDatabaseByEmail(email);
+    const maybeUser =
+      await retrieveUserAccountWithActiveMembershipsFromDatabaseByEmail(email);
 
     if (maybeUser) {
       if (inviteLinkInfo) {
+        const t = await i18next.getFixedT(request, 'organizations', {
+          keyPrefix: 'accept-invite-link',
+        });
+
+        // If the user is already a member of the organization, redirect to
+        // the organization dashboard and show a toast.
+        if (
+          maybeUser.memberships.some(
+            m => m.organizationId === inviteLinkInfo.organizationId,
+          )
+        ) {
+          return redirectWithToast(
+            href('/organizations/:organizationSlug/dashboard', {
+              organizationSlug: inviteLinkInfo.organizationSlug,
+            }),
+            {
+              title: t('already-member-toast-title'),
+              description: t('already-member-toast-description', {
+                organizationName: inviteLinkInfo.organizationName,
+              }),
+              type: 'info',
+            },
+            {
+              headers: combineHeaders(
+                headers,
+                await destroyInviteLinkInfoSession(request),
+              ),
+            },
+          );
+        }
+
+        // If the user is not a member of the organization, add them to the
+        // organization and save the invite link use.
         await addMembersToOrganizationInDatabaseById({
           id: inviteLinkInfo.organizationId,
           members: [maybeUser.id],
@@ -60,9 +94,6 @@ export async function loader({ request }: Route.LoaderArgs) {
         await saveInviteLinkUseToDatabase({
           inviteLinkId: inviteLinkInfo.inviteLinkId,
           userId: maybeUser.id,
-        });
-        const t = await i18next.getFixedT(request, 'organizations', {
-          keyPrefix: 'accept-invite-link',
         });
 
         return redirectWithToast(

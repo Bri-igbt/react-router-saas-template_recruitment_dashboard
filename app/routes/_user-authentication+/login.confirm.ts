@@ -6,7 +6,7 @@ import { destroyInviteLinkInfoSession } from '~/features/organizations/accept-in
 import { saveInviteLinkUseToDatabase } from '~/features/organizations/accept-invite-link/invite-link-use-model.server';
 import { addMembersToOrganizationInDatabaseById } from '~/features/organizations/organizations-model.server';
 import { saveUserAccountToDatabase } from '~/features/user-accounts/user-accounts-model.server';
-import { retrieveUserAccountFromDatabaseByEmail } from '~/features/user-accounts/user-accounts-model.server';
+import { retrieveUserAccountWithActiveMembershipsFromDatabaseByEmail } from '~/features/user-accounts/user-accounts-model.server';
 import { requireUserIsAnonymous } from '~/features/user-authentication/user-authentication-helpers.server';
 import { combineHeaders } from '~/utils/combine-headers.server';
 import { getSearchParameterFromRequest } from '~/utils/get-search-parameter-from-request.server';
@@ -43,7 +43,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   // will already have created a user (with an unconfirmed email).
   // So we need to check if the user already exists in the database and if not,
   // we need to create a new user account.
-  const userAccount = await retrieveUserAccountFromDatabaseByEmail(user.email);
+  const userAccount =
+    await retrieveUserAccountWithActiveMembershipsFromDatabaseByEmail(
+      user.email,
+    );
 
   const finalUserAccount =
     userAccount ??
@@ -53,6 +56,37 @@ export async function loader({ request }: Route.LoaderArgs) {
     }));
 
   if (inviteLinkInfo) {
+    const t = await i18next.getFixedT(request, 'organizations', {
+      keyPrefix: 'accept-invite-link',
+    });
+
+    // If the user is already a member of the organization, redirect to
+    // the organization dashboard and show a toast.
+    if (
+      userAccount?.memberships.some(
+        m => m.organizationId === inviteLinkInfo.organizationId,
+      )
+    ) {
+      return redirectWithToast(
+        href('/organizations/:organizationSlug/dashboard', {
+          organizationSlug: inviteLinkInfo.organizationSlug,
+        }),
+        {
+          title: t('already-member-toast-title'),
+          description: t('already-member-toast-description', {
+            organizationName: inviteLinkInfo.organizationName,
+          }),
+          type: 'info',
+        },
+        {
+          headers: combineHeaders(
+            headers,
+            await destroyInviteLinkInfoSession(request),
+          ),
+        },
+      );
+    }
+
     await addMembersToOrganizationInDatabaseById({
       id: inviteLinkInfo.organizationId,
       members: [finalUserAccount.id],
@@ -62,12 +96,9 @@ export async function loader({ request }: Route.LoaderArgs) {
       inviteLinkId: inviteLinkInfo.inviteLinkId,
       userId: finalUserAccount.id,
     });
-    const t = await i18next.getFixedT(request, 'organizations', {
-      keyPrefix: 'accept-invite-link',
-    });
 
     // If the user has a name, they're already onboarded and we can redirect
-    // them to their new organization's dashboar.
+    // them to their new organization's dashboard.
     return userAccount?.name
       ? redirectWithToast(
           href('/organizations/:organizationSlug/dashboard', {
