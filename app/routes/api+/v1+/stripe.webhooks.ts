@@ -3,8 +3,12 @@ import invariant from 'tiny-invariant';
 import { stripeAdmin } from '~/features/billing/stripe-admin.server';
 import {
   handleStripeCheckoutSessionCompletedEvent,
+  handleStripeCustomerDeletedEvent,
   handleStripeCustomerSubscriptionCreatedEvent,
+  handleStripeCustomerSubscriptionDeletedEvent,
   handleStripeCustomerSubscriptionUpdatedEvent,
+  handleStripeSubscriptionScheduleCreatedEvent,
+  handleStripeSubscriptionScheduleUpdatedEvent,
 } from '~/features/billing/stripe-event-handlers.server';
 import { getErrorMessage } from '~/utils/get-error-message';
 
@@ -56,11 +60,23 @@ export async function action({ request }: Route.ActionArgs) {
       case 'checkout.session.completed': {
         return handleStripeCheckoutSessionCompletedEvent(event);
       }
+      case 'customer.deleted': {
+        return handleStripeCustomerDeletedEvent(event);
+      }
       case 'customer.subscription.created': {
         return handleStripeCustomerSubscriptionCreatedEvent(event);
       }
+      case 'customer.subscription.deleted': {
+        return handleStripeCustomerSubscriptionDeletedEvent(event);
+      }
       case 'customer.subscription.updated': {
         return handleStripeCustomerSubscriptionUpdatedEvent(event);
+      }
+      case 'subscription_schedule.created': {
+        return handleStripeSubscriptionScheduleCreatedEvent(event);
+      }
+      case 'subscription_schedule.updated': {
+        return handleStripeSubscriptionScheduleUpdatedEvent(event);
       }
       case 'billing_portal.configuration.updated':
       case 'billing_portal.session.created':
@@ -74,7 +90,9 @@ export async function action({ request }: Route.ActionArgs) {
       case 'invoiceitem.created':
       case 'payment_intent.created':
       case 'payment_intent.succeeded':
-      case 'setup_intent.created': {
+      case 'payment_method.attached':
+      case 'setup_intent.created':
+      case 'subscription_schedule.released': {
         return json({ message: 'OK' });
       }
       default: {

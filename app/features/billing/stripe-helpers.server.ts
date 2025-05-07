@@ -1,5 +1,6 @@
 import type { Organization, UserAccount } from '@prisma/client';
 import { href } from 'react-router';
+import type Stripe from 'stripe';
 
 import { stripeAdmin } from '~/features/billing/stripe-admin.server';
 
@@ -107,7 +108,7 @@ export async function createStripeSwitchPlanSession({
    */
   quantity: number;
 }) {
-  // This will deep-link straight to the “Confirm this update” page
+  // This will deep-link straight to the "Confirm this update" page
   const session = await stripeAdmin.billingPortal.sessions.create({
     customer: customerId,
     return_url: `${baseUrl}${href(
@@ -130,14 +131,17 @@ export async function updateStripeCustomer({
   customerId,
   customerName,
   customerEmail,
+  organizationId,
 }: {
   customerId: string;
   customerName?: string;
   customerEmail?: string;
+  organizationId?: Organization['id'];
 }) {
   const customer = await stripeAdmin.customers.update(customerId, {
     ...(customerEmail ? { email: customerEmail } : {}),
     ...(customerName ? { name: customerName } : {}),
+    ...(organizationId ? { metadata: { organizationId } } : {}),
   });
 
   return customer;
@@ -149,7 +153,7 @@ export async function createStripeCancelSubscriptionSession({
   organizationSlug,
   subscriptionId,
 }: {
-  /** Your app’s public URL (e.g. https://app.example.com) */
+  /** Your app's public URL (e.g. https://app.example.com) */
   baseUrl: string;
   /** Stripe Customer ID */
   customerId: string;
@@ -165,7 +169,7 @@ export async function createStripeCancelSubscriptionSession({
       { organizationSlug },
     )}`,
     flow_data: {
-      // This invokes the “cancel subscription” deep‐link
+      // This invokes the "cancel subscription" deep-link
       type: 'subscription_cancel',
       subscription_cancel: {
         subscription: subscriptionId,
@@ -192,4 +196,10 @@ export async function resumeStripeSubscription(subscriptionId: string) {
 
   // 3) Otherwise, it's already active/not scheduled to cancel
   return subscription;
+}
+
+export async function keepCurrentSubscription(
+  scheduleId: Stripe.SubscriptionSchedule['id'],
+) {
+  return await stripeAdmin.subscriptionSchedules.release(scheduleId);
 }

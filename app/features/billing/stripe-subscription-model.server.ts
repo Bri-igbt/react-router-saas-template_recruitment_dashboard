@@ -20,7 +20,10 @@ export async function retrieveLatestStripeSubscriptionByOrganizationId(
   return await prisma.stripeSubscription.findFirst({
     where: { organizationId },
     orderBy: { created: 'desc' },
-    include: { items: { include: { price: true } } },
+    include: {
+      items: { include: { price: true } },
+      schedules: { include: { phases: { include: { price: true } } } },
+    },
   });
 }
 

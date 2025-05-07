@@ -328,7 +328,7 @@ describe('mapOnboardingUserToBillingSidebarCardProps()', () => {
     });
     const expected = {
       billingSidebarCardProps: {
-        freeTrialIsActive: true,
+        state: 'trialing',
         showButton: false,
         trialEndDate: organization.trialEnd,
       },
@@ -366,7 +366,7 @@ describe('mapOnboardingUserToBillingSidebarCardProps()', () => {
 
       const expected = {
         billingSidebarCardProps: {
-          freeTrialIsActive: true,
+          state: 'trialing',
           showButton: true,
           trialEndDate: organization.trialEnd,
         },
@@ -400,7 +400,7 @@ describe('mapOnboardingUserToBillingSidebarCardProps()', () => {
 
     const expected = {
       billingSidebarCardProps: {
-        freeTrialIsActive: false,
+        state: 'trialEnded',
         showButton: false,
         trialEndDate: organization.trialEnd,
       },

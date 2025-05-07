@@ -10,6 +10,7 @@ import { createPopulatedUserAccount } from '../user-accounts/user-accounts-facto
 import {
   createStripeCheckoutSession,
   createStripeSubscription,
+  createStripeSubscriptionSchedule,
 } from './stripe-factories.server';
 
 export const createStripeCheckoutSessionCompletedEvent: Factory<
@@ -85,6 +86,33 @@ export const createStripeCustomerSubscriptionCreatedEvent: Factory<
     idempotency_key: faker.string.uuid(),
   },
   type = 'customer.subscription.created',
+} = {}) => ({
+  id,
+  object,
+  api_version,
+  created,
+  data,
+  livemode,
+  pending_webhooks,
+  request,
+  type,
+});
+
+export const createStripeSubscriptionScheduleCreatedEvent: Factory<
+  Stripe.SubscriptionScheduleCreatedEvent
+> = ({
+  id = `evt_${createId()}`,
+  object = 'event',
+  api_version = '2025-03-31.basil',
+  created = Math.floor(faker.date.recent().getTime() / 1000),
+  data = { object: createStripeSubscriptionSchedule() },
+  livemode = false,
+  pending_webhooks = faker.number.int({ min: 1, max: 5 }),
+  request = {
+    id: null,
+    idempotency_key: faker.string.uuid(),
+  },
+  type = 'subscription_schedule.created',
 } = {}) => ({
   id,
   object,

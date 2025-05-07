@@ -4,6 +4,8 @@ import type {
   StripePrice,
   StripeSubscription,
   StripeSubscriptionItem,
+  StripeSubscriptionSchedule,
+  StripeSubscriptionSchedulePhase,
 } from '@prisma/client';
 
 import type { Factory } from '~/utils/types';
@@ -47,6 +49,52 @@ export const createPopulatedStripePrice: Factory<StripePrice> = ({
   currency,
   unitAmount,
   metadata,
+});
+
+/**
+ * Creates a Stripe subscription schedule with populated values.
+ *
+ * @param scheduleParams - StripeSubscriptionSchedule params to create the schedule with.
+ * @returns A populated Stripe subscription schedule with given params.
+ */
+export const createPopulatedStripeSubscriptionSchedule: Factory<
+  StripeSubscriptionSchedule
+> = ({
+  stripeId = `sub_sched_${createId()}`,
+  subscriptionId = createPopulatedStripeSubscription().stripeId,
+  created = faker.date.past({ years: 1 }),
+  currentPhaseStart = faker.date.past({ years: 1 }),
+  currentPhaseEnd = faker.date.future({ years: 1, refDate: currentPhaseStart }),
+} = {}) => ({
+  stripeId,
+  subscriptionId,
+  created,
+  currentPhaseStart,
+  currentPhaseEnd,
+});
+
+/**
+ * Creates a Stripe subscription schedule phase with populated values.
+ *
+ * @param phaseParams - StripeSubscriptionSchedulePhase params to create the phase with.
+ * @returns A populated Stripe subscription schedule phase with given params.
+ */
+export const createPopulatedStripeSubscriptionSchedulePhase: Factory<
+  StripeSubscriptionSchedulePhase
+> = ({
+  id = createId(),
+  scheduleId = createPopulatedStripeSubscriptionSchedule().stripeId,
+  startDate = faker.date.past({ years: 1 }),
+  endDate = faker.date.future({ years: 1, refDate: startDate }),
+  priceId = `price_${createId()}`,
+  quantity = faker.number.int({ min: 1, max: 100 }),
+} = {}) => ({
+  id,
+  scheduleId,
+  startDate,
+  endDate,
+  priceId,
+  quantity,
 });
 
 /**
@@ -116,8 +164,18 @@ export const createSubscriptionItemWithPrice: Factory<
   }),
 });
 
+export type SubscriptionSchedulePhaseWithPrice =
+  StripeSubscriptionSchedulePhase & {
+    price: StripePrice;
+  };
+
+export type SubscriptionScheduleWithPhases = StripeSubscriptionSchedule & {
+  phases: SubscriptionSchedulePhaseWithPrice[];
+};
+
 export type SubscriptionWithItems = StripeSubscription & {
   items: SubscriptionItemWithPrice[];
+  schedules: SubscriptionScheduleWithPhases[];
 };
 
 /**
@@ -135,6 +193,7 @@ export const createSubscriptionWithItems: Factory<SubscriptionWithItems> = ({
   ...rest
 } = {}) => ({
   ...createPopulatedStripeSubscription({ stripeId, ...rest }),
+  schedules: [],
   items: items.map(item => ({ ...item, stripeSubscriptionId: stripeId })),
 });
 
@@ -159,3 +218,38 @@ export const createSubscriptionWithPrice = ({
     ...rest,
   }),
 });
+/**
+ * Creates a Stripe subscription schedule phase with its associated price relation.
+ *
+ * @param params - Parameters to create the schedule phase and price with.
+ * @returns A populated schedule phase with its associated price.
+ */
+export const createSubscriptionSchedulePhaseWithPrice: Factory<
+  SubscriptionSchedulePhaseWithPrice
+> = ({ price = createPopulatedStripePrice(), ...rest } = {}) => ({
+  price,
+  ...createPopulatedStripeSubscriptionSchedulePhase({
+    priceId: price.stripeId,
+    ...rest,
+  }),
+});
+
+/**
+ * Creates a Stripe subscription schedule with its associated phases and prices.
+ *
+ * @param params - Parameters to create the schedule and phases with.
+ * @returns A populated schedule with its associated phases and prices.
+ */
+export const createSubscriptionScheduleWithPhases: Factory<
+  SubscriptionScheduleWithPhases
+> = ({
+  stripeId = createPopulatedStripeSubscriptionSchedule().stripeId,
+  phases = [createSubscriptionSchedulePhaseWithPrice({ scheduleId: stripeId })],
+  ...rest
+} = {}) => {
+  const base = createPopulatedStripeSubscriptionSchedule({ stripeId, ...rest });
+  return {
+    ...base,
+    phases: phases.map(phase => ({ ...phase, scheduleId: stripeId })),
+  };
+};

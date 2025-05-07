@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import {
   CANCEL_SUBSCRIPTION_INTENT,
+  KEEP_CURRENT_SUBSCRIPTION_INTENT,
   OPEN_CHECKOUT_SESSION_INTENT,
   RESUME_SUBSCRIPTION_INTENT,
   SWITCH_SUBSCRIPTION_INTENT,
@@ -17,6 +18,10 @@ export const cancelSubscriptionSchema = z.object({
 export const openCustomerCheckoutSessionSchema = z.object({
   intent: z.literal(OPEN_CHECKOUT_SESSION_INTENT),
   priceId: z.string(),
+});
+
+export const keepCurrentSubscriptionSchema = z.object({
+  intent: z.literal(KEEP_CURRENT_SUBSCRIPTION_INTENT),
 });
 
 export const resumeSubscriptionSchema = z.object({

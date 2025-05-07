@@ -370,3 +370,7 @@ test.describe('account settings', () => {
 // TODO: When updating the organization name, also update the Stripe customer.
 // TODO: add a notification 3 days before the trial ends.
 // TODO: prevent downgrade when they have more seats than the new plan would allow.
+// TODO: If during the free trial, you added more seats than any of the plan's
+// limits => they should only be able to pick plans that match their seats.
+// TODO: a downgrade from high annual to high annual should STILL show the
+// downgrade pending banner.

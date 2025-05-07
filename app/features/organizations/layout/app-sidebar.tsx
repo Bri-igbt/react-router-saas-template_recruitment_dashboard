@@ -98,7 +98,7 @@ export function AppSidebar({
             className={cn(
               'mt-auto overflow-hidden transition-[opacity,transform,max-height] ease-in-out',
               'max-h-[500px] scale-100 opacity-100 delay-200 duration-500',
-              'group-data-[state=collapsed]:max-h-0 group-data-[state=collapsed]:scale-95 group-data-[state=collapsed]:opacity-0 group-data-[state=collapsed]:delay-0 group-data-[state=collapsed]:duration-200',
+              'group-data-[state=collapsed]:max-h-0 group-data-[state=collapsed]:scale-95 group-data-[state=collapsed]:opacity-0 group-data-[state=collapsed]:delay-0 group-data-[state=collapsed]:duration-200 group-data-[variant=sidebar]:mx-2',
             )}
             {...billingSidebarCardProps}
           />

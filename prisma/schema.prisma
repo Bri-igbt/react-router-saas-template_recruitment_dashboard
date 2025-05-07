@@ -35,7 +35,7 @@ model Organization {
   slug                        String                        @unique
   imageUrl                    String                        @default("")
   billingEmail                String                        @default("")
-  stripeCustomerId            String?
+  stripeCustomerId            String?                       @unique
   /// We set this to 14 days from now by default in the Prisma middleware.
   trialEnd                    DateTime
   memberships                 OrganizationMembership[]
@@ -162,7 +162,7 @@ model StripeSubscription {
   stripeId       String       @id
   /// One‐to‐many with Organization
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @unique
+  organizationId String
   /// Who purchased it
   purchasedBy    UserAccount? @relation(fields: [purchasedById], references: [id], onDelete: SetNull)
   purchasedById  String?
@@ -180,6 +180,8 @@ model StripeSubscription {
   /// Possible values are incomplete, incomplete_expired, trialing, active,
   /// past_due, canceled, unpaid, or paused.
   status            StripeSubscriptionStatus
+  /// A subscription can have multiple schedules, each with a different price.
+  schedules         StripeSubscriptionSchedule[]
 }
 
 model StripeSubscriptionItem {
@@ -196,12 +198,34 @@ model StripeSubscriptionItem {
 }
 
 model StripePrice {
-  stripeId          String                   @id
-  lookupKey         String                   @unique
+  stripeId          String                            @id
+  lookupKey         String                            @unique
   currency          String
   unitAmount        Int
   metadata          Json
   subscriptionItems StripeSubscriptionItem[]
+  schedulePhases    StripeSubscriptionSchedulePhase[]
+}
+
+model StripeSubscriptionSchedule {
+  stripeId          String                            @id
+  subscriptionId    String
+  subscription      StripeSubscription                @relation(fields: [subscriptionId], references: [stripeId], onDelete: Cascade)
+  created           DateTime
+  currentPhaseStart DateTime
+  currentPhaseEnd   DateTime
+  phases            StripeSubscriptionSchedulePhase[]
+}
+
+model StripeSubscriptionSchedulePhase {
+  id         String                     @id @default(cuid(2))
+  scheduleId String
+  schedule   StripeSubscriptionSchedule @relation(fields: [scheduleId], references: [stripeId], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  priceId    String
+  price      StripePrice                @relation(fields: [priceId], references: [stripeId])
+  quantity   Int
 }
 
 model Notification {

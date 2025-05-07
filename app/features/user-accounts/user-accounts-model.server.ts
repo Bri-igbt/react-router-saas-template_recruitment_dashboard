@@ -117,7 +117,19 @@ export async function retrieveUserAccountWithMembershipsFromDatabaseBySupabaseUs
               slug: true,
               stripeCustomerId: true,
               stripeSubscriptions: {
-                include: { items: { include: { price: true } } },
+                include: {
+                  items: { include: { price: true } },
+                  schedules: {
+                    orderBy: { created: 'desc' },
+                    take: 1, // only the latest schedule
+                    include: {
+                      phases: {
+                        orderBy: { startDate: 'asc' },
+                        include: { price: true },
+                      },
+                    },
+                  },
+                },
               },
               trialEnd: true,
             },

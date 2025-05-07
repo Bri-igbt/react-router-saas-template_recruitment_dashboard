@@ -1,6 +1,8 @@
+import type { StripeSubscriptionSchedulePhase } from '@prisma/client';
 import { StripeSubscriptionStatus } from '@prisma/client';
 
 import type { OrganizationWithMembershipsAndSubscriptions } from '../onboarding/onboarding-helpers.server';
+import type { Interval, Tier } from './billing-constants';
 import { getTierAndIntervalForPriceId } from './billing-helpers';
 import type { BillingPageProps } from './billing-page';
 import type { CancelOrModifySubscriptionModalContentProps } from './cancel-or-modify-subscription-modal-content';
@@ -107,6 +109,25 @@ export function mapStripeSubscriptionDataToBillingPageProps({
       currentTierInterval: interval,
     };
 
+  // 9. Pending change
+  // 9.1) Grab the upcoming schedule (if any)
+  const schedule = subscription.schedules?.[0];
+  let nextPhase: StripeSubscriptionSchedulePhase | undefined;
+  if (schedule) {
+    nextPhase = schedule.phases.find(
+      p => p.startDate.getTime() > now.getTime(),
+    );
+  }
+
+  // 9.2) If there’s a nextPhase, derive its price & quantity
+  let pendingTier: Tier | undefined;
+  let pendingInterval: Interval | undefined;
+  if (nextPhase) {
+    const { tier, interval } = getTierAndIntervalForPriceId(nextPhase.priceId);
+    pendingTier = tier;
+    pendingInterval = interval;
+  }
+
   return {
     billingEmail: organization.billingEmail,
     cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
@@ -119,6 +140,13 @@ export function mapStripeSubscriptionDataToBillingPageProps({
     isOnFreeTrial: false,
     maxSeats,
     organizationSlug: organization.slug,
+    pendingChange: nextPhase
+      ? {
+          pendingChangeDate: nextPhase.startDate,
+          pendingInterval: pendingInterval!,
+          pendingTier: pendingTier!,
+        }
+      : undefined,
     projectedTotal,
     subscriptionStatus,
   };

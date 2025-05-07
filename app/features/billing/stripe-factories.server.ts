@@ -475,3 +475,134 @@ export const createStripeCheckoutSession: Factory<Stripe.Checkout.Session> = ({
   ui_mode,
   url,
 });
+
+/**
+ * Creates a Stripe SubscriptionSchedulePhase object with populated values.
+ */
+export const createStripeSubscriptionSchedulePhase: Factory<
+  Stripe.SubscriptionSchedule.Phase
+> = ({
+  add_invoice_items = [],
+  application_fee_percent = null,
+  automatic_tax = {
+    enabled: true,
+    liability: { type: 'self' as const },
+    disabled_reason: null,
+  },
+  billing_cycle_anchor = null,
+  collection_method = null,
+  currency = 'usd',
+  default_payment_method = null,
+  default_tax_rates = [],
+  description = null,
+  discounts = [],
+  end_date = Math.floor(faker.date.future().getTime() / 1000),
+  invoice_settings = null,
+  items = [
+    {
+      discounts: [],
+      metadata: {},
+      plan: `price_${createId()}`,
+      price: `price_${createId()}`,
+      quantity: 1,
+      tax_rates: [],
+    },
+  ],
+  metadata = {},
+  on_behalf_of = null,
+  proration_behavior = 'create_prorations' as const,
+  start_date = Math.floor(faker.date.recent().getTime() / 1000),
+  transfer_data = null,
+  trial_end = null,
+} = {}) => ({
+  add_invoice_items,
+  application_fee_percent,
+  automatic_tax,
+  billing_cycle_anchor,
+  collection_method,
+  currency,
+  default_payment_method,
+  default_tax_rates,
+  description,
+  discounts,
+  end_date,
+  invoice_settings,
+  items,
+  metadata,
+  on_behalf_of,
+  proration_behavior,
+  start_date,
+  transfer_data,
+  trial_end,
+});
+
+/**
+ * Creates a Stripe SubscriptionSchedule object with populated values.
+ */
+export const createStripeSubscriptionSchedule: Factory<
+  Stripe.SubscriptionSchedule
+> = ({
+  id = `sub_sched_${createId()}`,
+  object = 'subscription_schedule' as const,
+  application = null,
+  canceled_at = null,
+  completed_at = null,
+  created = Math.floor(faker.date.recent().getTime() / 1000),
+  current_phase = {
+    end_date: Math.floor(faker.date.future().getTime() / 1000),
+    start_date: Math.floor(faker.date.recent().getTime() / 1000),
+  },
+  customer = createStripeCustomer().id,
+  default_settings = {
+    application_fee_percent: null,
+    automatic_tax: {
+      disabled_reason: null,
+      enabled: true,
+      liability: {
+        type: 'self' as const,
+      },
+    },
+    billing_cycle_anchor: 'automatic' as const,
+    collection_method: 'charge_automatically' as const,
+    default_payment_method: `pm_${createId()}`,
+    default_source: null,
+    description: null,
+    invoice_settings: {
+      account_tax_ids: null,
+      days_until_due: null,
+      issuer: {
+        type: 'self' as const,
+      },
+    },
+    on_behalf_of: null,
+    transfer_data: null,
+  },
+  end_behavior = 'release' as const,
+  livemode = false,
+  metadata = {},
+  phases = [createStripeSubscriptionSchedulePhase()],
+  released_at = null,
+  released_subscription = null,
+  status = 'active' as const,
+  subscription = createStripeSubscription().id,
+  test_clock = null,
+} = {}) => ({
+  id,
+  object,
+  application,
+  canceled_at,
+  completed_at,
+  created,
+  current_phase,
+  customer,
+  default_settings,
+  end_behavior,
+  livemode,
+  metadata,
+  phases,
+  released_at,
+  released_subscription,
+  status,
+  subscription,
+  test_clock,
+});

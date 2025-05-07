@@ -21,9 +21,12 @@ import { Separator } from '~/components/ui/separator';
 
 import {
   CANCEL_SUBSCRIPTION_INTENT,
+  type Interval,
+  KEEP_CURRENT_SUBSCRIPTION_INTENT,
   pricesByTierAndInterval,
   RESUME_SUBSCRIPTION_INTENT,
   SWITCH_SUBSCRIPTION_INTENT,
+  type Tier,
   UPDATE_BILLING_EMAIL_INTENT,
   VIEW_INVOICES_INTENT,
 } from './billing-constants';
@@ -37,6 +40,68 @@ import {
   DescriptionTerm,
 } from './description-list';
 import { EditBillingEmailModalContent } from './edit-billing-email-modal-content';
+
+type PendingDowngradeBannerProps = {
+  pendingTier: Tier;
+  pendingInterval: Interval;
+  pendingChangeDate: Date;
+  isKeepingCurrentSubscription?: boolean;
+  isSubmitting?: boolean;
+};
+
+function PendingDowngradeBanner({
+  pendingChangeDate,
+  pendingInterval,
+  pendingTier,
+  isKeepingCurrentSubscription,
+  isSubmitting,
+}: PendingDowngradeBannerProps) {
+  const { t, i18n } = useTranslation('billing', {
+    keyPrefix: 'billing-page.pending-downgrade-banner',
+  });
+
+  const formattedDate = useMemo(() => {
+    return new Intl.DateTimeFormat(i18n.language || 'en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(pendingChangeDate));
+  }, [pendingChangeDate, i18n.language]);
+
+  return (
+    <Form className="@container/alert" method="POST" replace>
+      <Alert className="flex flex-col gap-2 @4xl/alert:block">
+        <AlertTitle>{t('title')}</AlertTitle>
+
+        <AlertDescription>
+          {t('description', {
+            date: formattedDate,
+            planName: pendingTier,
+            billingInterval: pendingInterval,
+          })}
+        </AlertDescription>
+
+        <Button
+          className="shadow-none @4xl/alert:absolute @4xl/alert:top-1/2 @4xl/alert:right-3 @4xl/alert:-translate-y-1/2"
+          disabled={isSubmitting}
+          name="intent"
+          size="sm"
+          type="submit"
+          value={KEEP_CURRENT_SUBSCRIPTION_INTENT}
+        >
+          {isKeepingCurrentSubscription ? (
+            <>
+              <Loader2Icon className="animate-spin" />
+              {t('loading-button')}
+            </>
+          ) : (
+            t('button')
+          )}
+        </Button>
+      </Alert>
+    </Form>
+  );
+}
 
 export type BillingPageProps = {
   billingEmail: Organization['billingEmail'];
@@ -52,11 +117,13 @@ export type BillingPageProps = {
   currentTierName: string;
   isCancellingSubscription?: boolean;
   isEnterprisePlan: boolean;
+  isKeepingCurrentSubscription?: boolean;
   isOnFreeTrial: boolean;
   isResumingSubscription?: boolean;
   isViewingInvoices?: boolean;
   maxSeats: number;
   organizationSlug: string;
+  pendingChange?: PendingDowngradeBannerProps;
   projectedTotal: number;
   subscriptionStatus: 'active' | 'inactive' | 'paused';
 };
@@ -70,11 +137,13 @@ export function BillingPage({
   currentSeats,
   currentTierName,
   isCancellingSubscription = false,
+  isKeepingCurrentSubscription = false,
   isOnFreeTrial,
   isResumingSubscription = false,
   isViewingInvoices = false,
   maxSeats,
   organizationSlug,
+  pendingChange,
   projectedTotal,
   subscriptionStatus,
 }: BillingPageProps) {
@@ -92,7 +161,10 @@ export function BillingPage({
   }, [currentPeriodEnd, i18n.language]);
 
   const isSubmitting =
-    isCancellingSubscription || isResumingSubscription || isViewingInvoices;
+    isCancellingSubscription ||
+    isKeepingCurrentSubscription ||
+    isResumingSubscription ||
+    isViewingInvoices;
 
   /* Switch subscription */
   const navigation = useNavigation();
@@ -213,6 +285,12 @@ export function BillingPage({
               </Button>
             </Alert>
           </Form>
+        ) : pendingChange ? (
+          <PendingDowngradeBanner
+            {...pendingChange}
+            isKeepingCurrentSubscription={isKeepingCurrentSubscription}
+            isSubmitting={isSubmitting}
+          />
         ) : (
           isOnFreeTrial && (
             <Dialog>
@@ -263,7 +341,7 @@ export function BillingPage({
 
           <Form method="POST" replace>
             <fieldset className="@container/form" disabled={isSubmitting}>
-              <Card className="mt-2 py-4 md:py-3">
+              <Card className="mt-2 py-4 shadow-xs md:py-3">
                 <DescriptionList>
                   {/* Current Plan */}
                   <DescriptionListRow className="flex-col @xl/form:grid @xl/form:grid-cols-[auto_1fr]">
@@ -398,7 +476,7 @@ export function BillingPage({
             </h3>
 
             <div className="@container/form">
-              <Card className="mt-2 py-4 md:py-3">
+              <Card className="mt-2 py-4 shadow-xs md:py-3">
                 <DescriptionList>
                   {/* Billing Email */}
                   <DescriptionListRow className="items-center justify-between @xl/form:h-10">

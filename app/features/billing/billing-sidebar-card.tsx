@@ -24,19 +24,19 @@ import { CreateSubscriptionModalContent } from './create-subscription-modal-cont
 
 export type BillingSidebarCardProps = {
   className?: string;
-  freeTrialIsActive: boolean;
+  state: 'trialing' | 'trialEnded' | 'cancelled';
   showButton: boolean;
   trialEndDate: Date;
 };
 
 export function BillingSidebarCard({
   className,
-  freeTrialIsActive,
+  state,
   showButton,
   trialEndDate,
 }: BillingSidebarCardProps) {
-  const { t } = useTranslation('organizations', {
-    keyPrefix: 'layout.app-sidebar.billing-sidebar-card',
+  const { t } = useTranslation('billing', {
+    keyPrefix: 'billing-sidebar-card',
   });
 
   return (
@@ -48,21 +48,31 @@ export function BillingSidebarCard({
           className,
         )}
       >
-        <CardHeader className="px-4">
+        <CardHeader
+          className={cn(
+            'px-4',
+            state === 'cancelled' &&
+              'text-destructive *:data-[slot=card-description]:text-destructive/90',
+          )}
+        >
           <CardTitle className="text-sm">
-            {freeTrialIsActive
+            {state === 'trialing'
               ? t('active-trial.title')
-              : t('trial-ended.title')}
+              : state === 'cancelled'
+                ? t('subscription-inactive.title')
+                : t('trial-ended.title')}
           </CardTitle>
 
           <CardDescription>
-            {freeTrialIsActive
+            {state === 'trialing'
               ? t('active-trial.description', {
                   date: formatDate(trialEndDate, 'MMMM dd, yyyy'),
                 })
-              : t('trial-ended.description', {
-                  date: formatDate(trialEndDate, 'MMMM dd, yyyy'),
-                })}
+              : state === 'cancelled'
+                ? t('subscription-inactive.description')
+                : t('trial-ended.description', {
+                    date: formatDate(trialEndDate, 'MMMM dd, yyyy'),
+                  })}
           </CardDescription>
         </CardHeader>
 
@@ -75,9 +85,11 @@ export function BillingSidebarCard({
                 size="sm"
                 type="button"
               >
-                {freeTrialIsActive
+                {state === 'trialing'
                   ? t('active-trial.button')
-                  : t('trial-ended.button')}
+                  : state === 'cancelled'
+                    ? t('subscription-inactive.button')
+                    : t('trial-ended.button')}
               </Button>
             </DialogTrigger>
           </CardContent>

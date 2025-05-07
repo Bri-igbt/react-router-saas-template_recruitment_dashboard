@@ -17,22 +17,6 @@
   },
   "layout": {
     "app-sidebar": {
-      "billing-sidebar-card": {
-        "active-trial": {
-          "button": "Add payment information",
-          "description": "Trial ends on {{date}}.",
-          "title": "Business Plan (Trial)"
-        },
-        "billing-modal": {
-          "description": "Pick a plan that fits your needs.",
-          "title": "Choose your plan"
-        },
-        "trial-ended": {
-          "button": "Resume subscription",
-          "description": "Trial ended on {{date}}.",
-          "title": "Business Plan (Trial)"
-        }
-      },
       "nav": {
         "app": {
           "analytics": "Analytics",

@@ -6,6 +6,7 @@ import { GeneralErrorBoundary } from '~/components/general-error-boundary';
 import { billingAction } from '~/features/billing/billing-action.server';
 import {
   CANCEL_SUBSCRIPTION_INTENT,
+  KEEP_CURRENT_SUBSCRIPTION_INTENT,
   RESUME_SUBSCRIPTION_INTENT,
   VIEW_INVOICES_INTENT,
 } from '~/features/billing/billing-constants';
@@ -59,6 +60,8 @@ export default function OrganizationBillingSettingsRoute({
   const navigation = useNavigation();
   const isCancellingSubscription =
     navigation.formData?.get('intent') === CANCEL_SUBSCRIPTION_INTENT;
+  const isKeepingCurrentSubscription =
+    navigation.formData?.get('intent') === KEEP_CURRENT_SUBSCRIPTION_INTENT;
   const isResumingSubscription =
     navigation.formData?.get('intent') === RESUME_SUBSCRIPTION_INTENT;
   const isViewingInvoices =
@@ -68,6 +71,7 @@ export default function OrganizationBillingSettingsRoute({
     <BillingPage
       {...billingPageProps}
       isCancellingSubscription={isCancellingSubscription}
+      isKeepingCurrentSubscription={isKeepingCurrentSubscription}
       isResumingSubscription={isResumingSubscription}
       isViewingInvoices={isViewingInvoices}
     />

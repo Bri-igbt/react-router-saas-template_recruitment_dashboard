@@ -12,6 +12,10 @@ import {
   createPopulatedStripePrice,
   createPopulatedStripeSubscription,
   createPopulatedStripeSubscriptionItem,
+  createPopulatedStripeSubscriptionSchedule,
+  createSubscriptionSchedulePhaseWithPrice,
+  createSubscriptionScheduleWithPhases,
+  type SubscriptionScheduleWithPhases,
 } from './billing-factories.server';
 import type { StripeSubscriptionData } from './billing-helpers.server';
 import {
@@ -54,7 +58,9 @@ export const createStripeSubscriptionData: Factory<StripeSubscriptionData> = (
     return { ...item, price };
   });
 
-  return { ...subscription, items };
+  const schedules: SubscriptionScheduleWithPhases[] = [];
+
+  return { ...subscription, items, schedules };
 };
 
 describe('mapStripeSubscriptionDataToBillingPageProps()', () => {
@@ -247,6 +253,101 @@ describe('mapStripeSubscriptionDataToBillingPageProps()', () => {
       organizationSlug: organization.slug,
       projectedTotal: 170,
       subscriptionStatus: 'active',
+    };
+
+    expect(actual).toEqual(expected);
+  });
+
+  test('given: a subscription with a pending downgrade, should: return correct billing props', () => {
+    const now = new Date('2025-06-15T00:00:00.000Z');
+    const subscriptionId = createStripeSubscriptionData().stripeId;
+    const subscriptionScheduleId =
+      createPopulatedStripeSubscriptionSchedule().stripeId;
+
+    // 1) Start with a live, high-tier subscription
+    const subscription = {
+      ...createStripeSubscriptionData({
+        stripeId: subscriptionId,
+        organizationId: 'org-789',
+        cancelAtPeriodEnd: false,
+        status: 'active',
+        items: [
+          {
+            price: createPopulatedStripePrice({
+              lookupKey: pricesByTierAndInterval.high_monthly.lookupKey,
+              unitAmount: 6000,
+              metadata: { max_seats: 10 },
+            }),
+            ...createPopulatedStripeSubscriptionItem({
+              currentPeriodStart: new Date('2025-05-01T00:00:00.000Z'),
+              currentPeriodEnd: new Date('2025-06-30T00:00:00.000Z'),
+            }),
+          },
+        ],
+      }),
+      schedules: [
+        createSubscriptionScheduleWithPhases({
+          subscriptionId,
+          phases: [
+            createSubscriptionSchedulePhaseWithPrice({
+              scheduleId: subscriptionScheduleId,
+              startDate: new Date('2025-05-01T00:00:00.000Z'),
+              endDate: new Date('2025-06-30T00:00:00.000Z'),
+              price: createPopulatedStripePrice({
+                lookupKey: pricesByTierAndInterval.high_monthly.lookupKey,
+                unitAmount: 6000,
+                metadata: { max_seats: 10 },
+              }),
+              quantity: 5,
+            }),
+            createSubscriptionSchedulePhaseWithPrice({
+              scheduleId: subscriptionScheduleId,
+              startDate: new Date('2025-06-30T00:00:00.000Z'),
+              endDate: new Date('2025-07-30T00:00:00.000Z'),
+              price: createPopulatedStripePrice({
+                lookupKey: pricesByTierAndInterval.low_monthly.lookupKey,
+                unitAmount: 2000,
+                metadata: { max_seats: 10 },
+              }),
+              quantity: 2,
+            }),
+          ],
+        }),
+      ],
+    };
+
+    const organization = createOrganizationWithMembershipsAndSubscriptions({
+      stripeSubscriptions: [subscription],
+      memberCount: 5,
+    });
+
+    const actual = mapStripeSubscriptionDataToBillingPageProps({
+      organization,
+      now,
+    });
+    const expected: BillingPageProps = {
+      billingEmail: organization.billingEmail,
+      cancelAtPeriodEnd: false,
+      cancelOrModifySubscriptionModalProps: {
+        canCancelSubscription: true,
+        currentTier: 'high',
+        currentTierInterval: 'monthly',
+      },
+      currentMonthlyRatePerUser: 60,
+      currentPeriodEnd: new Date('2025-06-30T00:00:00.000Z'),
+      currentSeats: 5,
+      currentTierName: 'Business',
+      isEnterprisePlan: false,
+      isOnFreeTrial: false,
+      maxSeats: 10,
+      organizationSlug: organization.slug,
+      projectedTotal: 300,
+      subscriptionStatus: 'active',
+      pendingChange: {
+        pendingChangeDate: new Date('2025-06-30T00:00:00.000Z'),
+        pendingInterval: 'monthly',
+        pendingTier: 'low',
+      },
     };
 
     expect(actual).toEqual(expected);

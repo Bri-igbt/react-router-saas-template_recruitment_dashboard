@@ -406,6 +406,59 @@ describe('BillingPage component', () => {
     expect(screen.queryByText(/billing email/i)).not.toBeInTheDocument();
   });
 
+  test('given: a pending change because a subscription is scheduled to downgrade, should: show a banner with the details of the pending change', () => {
+    const props = createProps({
+      pendingChange: {
+        pendingTier: 'mid' as const,
+        pendingInterval: 'monthly' as const,
+        pendingChangeDate: new Date('2025-02-12T00:00:00.000Z'),
+      },
+      currentTierName: 'high',
+    });
+    const RouterStub = createRoutesStub([
+      { path, Component: () => <BillingPage {...props} /> },
+    ]);
+
+    render(<RouterStub initialEntries={[path]} />);
+
+    expect(screen.getByText(/downgrade scheduled/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /your subscription will downgrade to the mid monthly plan on february 12, 2025/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /keep current subscription/i }),
+    ).toBeInTheDocument();
+  });
+
+  test('given: a pending change because a subscription is scheduled to downgrade and the user is keeping their current subscription, should: show a banner with the details of the pending change', () => {
+    const props = createProps({
+      isKeepingCurrentSubscription: true,
+      pendingChange: {
+        pendingTier: 'mid' as const,
+        pendingInterval: 'monthly' as const,
+        pendingChangeDate: new Date('2025-02-12T00:00:00.000Z'),
+      },
+      currentTierName: 'high',
+    });
+    const RouterStub = createRoutesStub([
+      { path, Component: () => <BillingPage {...props} /> },
+    ]);
+
+    render(<RouterStub initialEntries={[path]} />);
+
+    expect(screen.getByText(/downgrade scheduled/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /your subscription will downgrade to the mid monthly plan on february 12, 2025/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /updating subscription/i }),
+    ).toBeDisabled();
+  });
+
   test.todo(
     'given: the user is on an enterprise plan, should: show the available data',
   );

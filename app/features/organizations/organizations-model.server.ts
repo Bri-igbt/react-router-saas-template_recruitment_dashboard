@@ -228,7 +228,7 @@ export async function upsertStripeSubscriptionForOrganizationInDatabaseById({
       stripeCustomerId,
       stripeSubscriptions: {
         upsert: {
-          where: { organizationId }, // because StripeSubscription has `organizationId` as `@unique`
+          where: { organizationId, stripeId: stripeSubscription.id },
           create: {
             stripeId: stripeSubscription.id,
             purchasedById,

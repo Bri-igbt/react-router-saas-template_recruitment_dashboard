@@ -96,7 +96,10 @@ export const createOnboardingUser = (
         _count: { memberships: faker.number.int({ min: 1, max: 10 }) },
         // Each org gets at least one subscription with items
         stripeSubscriptions: [
-          createSubscriptionWithItems({ organizationId: organization.id }),
+          {
+            ...createSubscriptionWithItems({ organizationId: organization.id }),
+            schedules: [],
+          },
         ],
       },
     };

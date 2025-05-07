@@ -37,6 +37,13 @@
       "edit-button": "Edit",
       "heading": "Payment Information"
     },
+    "pending-downgrade-banner": {
+      "button": "Keep current subscription",
+      "description": "Your subscription will downgrade to the {{planName}} ({{billingInterval}}) plan on {{date}}.",
+      "loading-button": "Updating subscription ...",
+      "success-title": "Current subscription kept",
+      "title": "Downgrade scheduled"
+    },
     "plan-information": {
       "amount-format": "${{amount}}",
       "current-plan": "Current Plan",
@@ -88,6 +95,27 @@
       "submit-button": "Save changes",
       "success-title": "Billing email updated",
       "title": "Edit your billing email"
+    }
+  },
+  "billing-sidebar-card": {
+    "active-trial": {
+      "button": "Add payment information",
+      "description": "Trial ends on {{date}}.",
+      "title": "Business Plan (Trial)"
+    },
+    "billing-modal": {
+      "description": "Pick a plan that fits your needs.",
+      "title": "Choose your plan"
+    },
+    "subscription-inactive": {
+      "button": "Choose plan",
+      "description": "Renew to keep using the app.",
+      "title": "Subscription inactive"
+    },
+    "trial-ended": {
+      "button": "Resume subscription",
+      "description": "Trial ended on {{date}}.",
+      "title": "Business Plan (Trial)"
     }
   },
   "billing-success-page": {

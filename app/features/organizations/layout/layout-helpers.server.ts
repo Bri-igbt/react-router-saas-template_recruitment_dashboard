@@ -99,18 +99,28 @@ export function mapOnboardingUserToBillingSidebarCardProps({
     return {};
   }
 
-  if (currentOrganization.stripeSubscriptions.length > 0) {
-    return {};
-  }
-
   const showButton =
     currentMembership.role === OrganizationMembershipRole.admin ||
     currentMembership.role === OrganizationMembershipRole.owner;
 
+  if (currentOrganization.stripeSubscriptions.length > 0) {
+    const subscription = currentOrganization.stripeSubscriptions[0];
+    const isCancelled = subscription.status === 'canceled';
+    return isCancelled
+      ? {
+          billingSidebarCardProps: {
+            showButton,
+            state: 'cancelled',
+            trialEndDate: new Date(),
+          },
+        }
+      : {};
+  }
+
   return {
     billingSidebarCardProps: {
-      freeTrialIsActive: now < currentOrganization.trialEnd,
       showButton,
+      state: now < currentOrganization.trialEnd ? 'trialing' : 'trialEnded',
       trialEndDate: currentOrganization.trialEnd,
     },
   };

@@ -16,6 +16,7 @@ import { requireUserIsMemberOfOrganization } from '../organizations/organization
 import { updateOrganizationInDatabaseById } from '../organizations/organizations-model.server';
 import {
   CANCEL_SUBSCRIPTION_INTENT,
+  KEEP_CURRENT_SUBSCRIPTION_INTENT,
   OPEN_CHECKOUT_SESSION_INTENT,
   RESUME_SUBSCRIPTION_INTENT,
   SWITCH_SUBSCRIPTION_INTENT,
@@ -25,6 +26,7 @@ import {
 import { extractBaseUrl } from './billing-helpers.server';
 import {
   cancelSubscriptionSchema,
+  keepCurrentSubscriptionSchema,
   openCustomerCheckoutSessionSchema,
   resumeSubscriptionSchema,
   switchSubscriptionSchema,
@@ -36,13 +38,16 @@ import {
   createStripeCheckoutSession,
   createStripeCustomerPortalSession,
   createStripeSwitchPlanSession,
+  keepCurrentSubscription,
   resumeStripeSubscription,
   updateStripeCustomer,
 } from './stripe-helpers.server';
 import { upsertStripeSubscriptionForOrganizationInDatabaseById } from './stripe-subscription-model.server';
+import { deleteStripeSubscriptionScheduleFromDatabaseById } from './stripe-subscription-schedule-model.server';
 
 const schema = z.discriminatedUnion('intent', [
   cancelSubscriptionSchema,
+  keepCurrentSubscriptionSchema,
   openCustomerCheckoutSessionSchema,
   resumeSubscriptionSchema,
   switchSubscriptionSchema,
@@ -81,6 +86,29 @@ export async function billingAction({ request, params }: Route.ActionArgs) {
         });
 
         return redirect(cancelSession.url);
+      }
+
+      case KEEP_CURRENT_SUBSCRIPTION_INTENT: {
+        const currentSubscription = organization.stripeSubscriptions[0];
+
+        if (!currentSubscription) {
+          throw new Error('Organization has no Stripe subscriptions');
+        }
+
+        if (currentSubscription.schedules?.[0]) {
+          const schedule = await keepCurrentSubscription(
+            currentSubscription.schedules[0].stripeId,
+          );
+
+          await deleteStripeSubscriptionScheduleFromDatabaseById(schedule.id);
+        }
+
+        const toast = await createToastHeaders({
+          title: t('pending-downgrade-banner.success-title'),
+          type: 'success',
+        });
+
+        return data({}, { headers: combineHeaders(toast, headers) });
       }
 
       case OPEN_CHECKOUT_SESSION_INTENT: {

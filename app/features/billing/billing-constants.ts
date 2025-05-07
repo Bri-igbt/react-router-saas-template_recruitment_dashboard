@@ -1,4 +1,5 @@
 export const CANCEL_SUBSCRIPTION_INTENT = 'cancelSubscription';
+export const KEEP_CURRENT_SUBSCRIPTION_INTENT = 'keepCurrentSubscription';
 export const OPEN_CHECKOUT_SESSION_INTENT = 'openCheckoutSession';
 export const RESUME_SUBSCRIPTION_INTENT = 'resumeSubscription';
 export const SWITCH_SUBSCRIPTION_INTENT = 'switchSubscription';
