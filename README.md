@@ -39,6 +39,12 @@ Why is good test coverage important for a template? For the same reason why it's
 
 ## Getting Started
 
+Get the code:
+
+```bash
+npx create-remix --template janhesters/react-router-saas-template
+```
+
 ### Installation
 
 Install the dependencies:
