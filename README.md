@@ -57,7 +57,7 @@ Create `.env` file. You can find the `.env.example` file in the root of the proj
 
 Start by setting the environment variables that you can configure without setting up a service:
 
-- `DATABASE_URL` – The URL of your local Postgres database.
+- `DATABASE_URL` – The URL of your local Postgres database. You can just download the [Postgres.app](https://postgresapp.com/) and use it to create a local database.
 - `APP_URL` – The URL of your app, e.g. `http://localhost:3000`.
 - `SESSION_SECRET` – A random string of characters. This is used for the authentication session.
 - `COOKIE_SECRET` – A random string of characters. This is used for the dark mode cookie.
