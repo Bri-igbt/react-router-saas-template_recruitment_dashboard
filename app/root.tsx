@@ -22,7 +22,6 @@ import type { Route } from './+types/root';
 import { NotFound } from './components/not-found';
 import { Toaster } from './components/ui/sonner';
 import { getColorScheme } from './features/color-scheme/color-scheme.server';
-import { ColorSchemeScript } from './features/color-scheme/color-scheme-script';
 import { useColorScheme } from './features/color-scheme/use-color-scheme';
 import {
   getInstance,
@@ -106,19 +105,8 @@ export function Layout({
   useToast(data?.toast);
 
   return (
-    <html
-      className={colorScheme}
-      lang={locale}
-      dir={i18n.dir()}
-      // When the user a.) has their system color scheme set to "dark", and b.)
-      // picks "system" in the theme toggle, the color scheme is undefined from
-      // the root loader, but "dark" in the client. There won't be a flash
-      // because the `ColorSchemeScript` will set the correct class name using
-      // `useLayoutEffect`.
-      suppressHydrationWarning
-    >
+    <html className={colorScheme} lang={locale} dir={i18n.dir()}>
       <head>
-        <ColorSchemeScript />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
