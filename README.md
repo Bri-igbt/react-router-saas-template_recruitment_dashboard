@@ -3,6 +3,12 @@
 A modern, production-ready template for building full-stack B2B & B2C SaaS
 applications using React Router.
 
+[![YouTbe thumbnail](https://i.ytimg.com/vi/5p45AbpL4bo/maxresdefault.jpg)](https://www.youtube.com/watch?v=5p45AbpL4bo)
+
+You can
+[click here to watch the video](https://www.youtube.com/watch?v=5p45AbpL4bo)
+explaining the template.
+
 ## Tech Stack
 
 - 📖 [React Router](https://reactrouter.com/)
